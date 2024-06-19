@@ -6,6 +6,8 @@ You can read more about our work in the paper:
 
 This implementation of the ACORN index is built on [**The FAISS Library**](https://github.com/facebookresearch/faiss) in C++.
 
+If you run into any issues, please open an [issue](https://github.com/stanford-futuredata/ACORN/issues) and we'll respond promptly!
+
 ## Installation
 ```
 git clone https://github.com/stanford-futuredata/ACORN.git
