@@ -88,7 +88,8 @@ float* fvecs_read(const char* fname, size_t* d_out, size_t* n_out) {
         abort();
     }
     int d;
-    fread(&d, 1, sizeof(int), f);
+    int size = fread(&d, 1, sizeof(int), f);
+    printf("Dimension: %d\n", d);
     assert((d > 0 && d < 1000000) || !"unreasonable dimension");
     fseek(f, 0, SEEK_SET);
     struct stat st;

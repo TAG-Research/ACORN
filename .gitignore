@@ -16,4 +16,5 @@
 /c_api/gpu/bin/
 /tests/test
 /tests/gtest/
+/build/
 faiss/python/swigfaiss_avx2.swig
