@@ -115,8 +115,7 @@ int main(int argc, char *argv[]) {
     // load metadata
     n_centroids = gamma;
 
-    std::vector<int> metadata = load_ab(dataset, gamma, 
-    , N);
+    std::vector<int> metadata = load_ab(dataset, gamma, assignment_type, N);
     metadata.resize(N);
     assert(N == metadata.size());
     printf("[%.3f s] Loaded metadata, %ld attr's found\n", 
