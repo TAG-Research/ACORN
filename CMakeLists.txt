@@ -78,7 +78,6 @@ if(NOT nlohmann_json_POPULATED)
     add_subdirectory(${nlohmann_json_SOURCE_DIR} ${nlohmann_json_BINARY_DIR})
 endif()
 
-target_include_directories(test_acorn PUBLIC ${nlohmann_json_SOURCE_DIR}/include)
 
 find_package(ZLIB REQUIRED)
 target_link_libraries(faiss PUBLIC ${ZLIB_LIBRARIES})
