@@ -18,9 +18,9 @@ now=$(date +"%m-%d-%Y")
 
 
 # run of sift1M test
-N=1000000 
+N=10000 
 gamma=12 
-dataset=sift1M_test 
+dataset=sift1M
 M=32 
 M_beta=64
 
@@ -34,7 +34,7 @@ mkdir ${dir}
 TZ='America/Los_Angeles' date +"Start time: %H:%M" &>> ${dir}/summary_sift_n=${N}_gamma=${gamma}.txt
 
 
-./build/demos/test_acorn $N $gamma $dataset $M $M_beta  &>> ${dir}/summary_sift_n=${N}_gamma=${gamma}.txt
+./build/demos/test_acorn $N $gamma $dataset $M $M_beta  #&>> ${dir}/summary_sift_n=${N}_gamma=${gamma}.txt
 
      
 
