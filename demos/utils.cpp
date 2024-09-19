@@ -112,6 +112,40 @@ float* fvecs_read(const char* fname, size_t* d_out, size_t* n_out) {
     return x;
 }
 
+float* fbin_read(const char* fname, size_t* d_out, size_t* n_out) {
+    FILE* f = fopen(fname, "rb"); // Open in binary mode
+    if (!f) {
+        fprintf(stderr, "could not open %s\n", fname);
+        perror("");
+        abort();
+    }
+
+    int N, D;
+    size_t read_items = fread(&N, sizeof(int), 1, f); // Read N
+    assert(read_items == 1 || !"could not read N");
+
+    read_items = fread(&D, sizeof(int), 1, f); // Read D
+    assert(read_items == 1 || !"could not read D");
+
+    printf("Loading from binary file: %s\n", fname);
+    printf("Number of points (N): %d\n", N);
+    printf("Dimension (D): %d\n", D);
+
+    *d_out = D;
+    *n_out = N;
+
+    // Allocate memory for all vectors
+    float* x = new float[N * D];
+
+    // Read all vector data
+    size_t nr = fread(x, sizeof(float), N * D, f);
+    assert(nr == N * D || !"could not read all vector data");
+
+    fclose(f);
+    return x;
+
+}
+
 // not very clean, but works as long as sizeof(int) == sizeof(float)
 int* ivecs_read(const char* fname, size_t* d_out, size_t* n_out) {
     return (int*)fvecs_read(fname, d_out, n_out);
@@ -372,6 +406,37 @@ std::vector<int> load_aq(std::string dataset, int n_centroids, int alpha, int N)
     }
     
 
+}
+ 
+    // Helper function to replace all occurrences of a substring with another string
+    void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+        if (from.empty())
+            return;
+        size_t start_pos = 0;
+        while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+            str.replace(start_pos, from.length(), to);
+            start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+        }
+    }
+
+std::vector<std::string> load_metadata_strings(std::string file_name, int N) {
+ 
+    std::vector<std::string> lines;
+    std::ifstream file(file_name);
+    std::string line;
+ 
+    while (std::getline(file, line)) {
+        // Replace all occurrences of '&&' with '&' and '||' with '|'
+        replaceAll(line, "&&", "&");
+        replaceAll(line, "||", "|");
+        lines.push_back(line);
+    }
+    file.close();
+
+    printf("loaded metadata from: %s\n", file_name.c_str());
+    printf("Number of lines loaded: %zu\n", lines.size());
+    printf("Value of N: %d\n", N);
+    return lines;
 }
 
 // assignment_type can be "rand", "soft", "soft_squared", "hard"
