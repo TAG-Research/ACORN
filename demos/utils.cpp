@@ -462,7 +462,7 @@ std::vector<faiss::idx_t> load_gt(std::string dataset, int n_centroids, int alph
         std::vector<int> v_tmp = load_json_to_vector<int>(filepath);
         std::vector<faiss::idx_t> v(v_tmp.begin(), v_tmp.end());
         printf("loaded gt from: %s\n", filepath.c_str());
-
+        printf("gt size: %ld\n", v.size());
         // // print out data for debugging
         // for (faiss::idx_t i : v) {
         //     std::cout << i << " ";

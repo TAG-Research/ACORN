@@ -161,13 +161,13 @@ int main(int argc, char *argv[]) {
     printf("[%.3f s] Index Params -- d: %ld, M: %d, N: %ld, gamma: %d\n",
                elapsed() - t0, d, M, N, gamma);
     // base HNSW index
-    faiss::IndexHNSWFlat base_index(d, M, 1); // gamma = 1
-    base_index.hnsw.efConstruction = efc; // default is 40  in HNSW.capp
-    base_index.hnsw.efSearch = efs; // default is 16 in HNSW.capp
+    faiss::IndexHNSWFlat base_index_HNSWFlat(d, M, 1); // gamma = 1
+    base_index_HNSWFlat.hnsw.efConstruction = efc; // default is 40  in HNSW.capp
+    base_index_HNSWFlat.hnsw.efSearch = efs; // default is 16 in HNSW.capp
     
     // ACORN-gamma
-    faiss::IndexACORNFlat hybrid_index(d, M, gamma, metadata, M_beta);
-    hybrid_index.acorn.efSearch = efs; // default is 16 HybridHNSW.capp
+    faiss::IndexACORNFlat hybrid_index_ACORNFlat(d, M, gamma, metadata, M_beta);
+    hybrid_index_ACORNFlat.acorn.efSearch = efs; // default is 16 HybridHNSW.capp
     debug("ACORN index created%s\n", "");
 
 
@@ -202,11 +202,11 @@ int main(int argc, char *argv[]) {
 
         printf("[%.3f s] Adding the vectors to the index\n", elapsed() - t0);
         
-        base_index.add(N, xb);
+        base_index_HNSWFlat.add(N, xb);
         printf("[%.3f s] Vectors added to base index \n", elapsed() - t0);
         std::cout << "Base index vectors added: " << nb << std::endl;
 
-        hybrid_index.add(N, xb);
+        hybrid_index_ACORNFlat.add(N, xb);
         printf("[%.3f s] Vectors added to hybrid index \n", elapsed() - t0);
         std::cout << "Hybrid index vectors added" << nb << std::endl;
         // printf("SKIPPED creating ACORN-gamma\n");
@@ -235,7 +235,7 @@ int main(int argc, char *argv[]) {
             filepath_stream << "./tmp/" << dataset << "/hybrid" << "_M=" << M << "_efc" << efc << "_Mb=" << M_beta << "_gamma=" << gamma << ".json";
         }
         std::string filepath = filepath_stream.str();
-        write_index(&hybrid_index, filepath.c_str());
+        write_index(&hybrid_index_ACORNFlat, filepath.c_str());
         printf("[%.3f s] Wrote hybrid index to file: %s\n", elapsed() - t0, filepath.c_str());
         
         // write hybrid_gamma1 index
@@ -260,7 +260,7 @@ int main(int argc, char *argv[]) {
                 filepath_stream << "./tmp/" << dataset << "/base" << "_M=" << M << "_efc=" << efc << ".json";
             }
             std::string filepath = filepath_stream.str();
-            write_index(&base_index, filepath.c_str());
+            write_index(&base_index_HNSWFlat, filepath.c_str());
             printf("[%.3f s] Wrote base index to file: %s\n", elapsed() - t0, filepath.c_str());
         }
       
@@ -276,11 +276,11 @@ int main(int argc, char *argv[]) {
         printf("====================================\n");
         printf("============ BASE INDEX =============\n");
         printf("====================================\n");
-        base_index.printStats(false);
+        base_index_HNSWFlat.printStats(false);
         printf("====================================\n");
         printf("============ ACORN INDEX =============\n");
         printf("====================================\n");
-        hybrid_index.printStats(false);
+        hybrid_index_ACORNFlat.printStats(false);
        
     }
 
@@ -301,7 +301,7 @@ int main(int argc, char *argv[]) {
                elapsed() - t0,
                k,
                nq,
-               base_index.hnsw.efSearch);
+               base_index_HNSWFlat.hnsw.efSearch);
 
         std::vector<faiss::idx_t> nns(k * nq);
         std::vector<float> dis(k * nq);
@@ -312,7 +312,7 @@ int main(int argc, char *argv[]) {
  
 
         double t1 = elapsed();
-        base_index.search(nq, xq, k, dis.data(), nns.data());
+        base_index_HNSWFlat.search(nq, xq, k, dis.data(), nns.data());
         double t2 = elapsed();
 
         printf("[%.3f s] Query results (vector ids, then distances):\n",
@@ -369,7 +369,7 @@ int main(int argc, char *argv[]) {
                elapsed() - t0,
                k,
                nq,
-               hybrid_index.acorn.efSearch);
+               hybrid_index_ACORNFlat.acorn.efSearch);
 
         std::vector<faiss::idx_t> nns2(k * nq);
         std::vector<float> dis2(k * nq);
@@ -383,7 +383,7 @@ int main(int argc, char *argv[]) {
         }
 
         double t1_x = elapsed();
-        hybrid_index.search(nq, xq, k, dis2.data(), nns2.data(), filter_ids_map.data()); // TODO change first argument back to nq
+        hybrid_index_ACORNFlat.search(nq, xq, k, dis2.data(), nns2.data(), filter_ids_map.data()); // TODO change first argument back to nq
         double t2_x = elapsed();
 
 
