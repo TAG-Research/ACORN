@@ -107,3 +107,11 @@ target_link_libraries(utils PRIVATE faiss)
 add_executable(test_acorn EXCLUDE_FROM_ALL test_acorn.cpp)
 target_include_directories(test_acorn PUBLIC ${nlohmann_json_SOURCE_DIR}/include)
 target_link_libraries(test_acorn PRIVATE faiss)
+
+add_executable(acorn EXCLUDE_FROM_ALL acorn.cpp)
+target_include_directories(acorn PUBLIC ${nlohmann_json_SOURCE_DIR}/include)
+target_link_libraries(acorn PRIVATE faiss)
+
+add_executable(label EXCLUDE_FROM_ALL MutiLabel.cpp)
+target_include_directories(label PUBLIC ${nlohmann_json_SOURCE_DIR}/include)
+target_link_libraries(label PRIVATE faiss)

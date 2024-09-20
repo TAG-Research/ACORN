@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
     int efc = 40; // default is 40
     int efs = 16; //  default is 16
     int k = 10; // search parameter
-    size_t d = 128; // dimension of the vectors to index - will be overwritten by the dimension of the dataset
+    size_t d = 384; // dimension of the vectors to index - will be overwritten by the dimension of the dataset
     int M; // HSNW param M TODO change M back
     int M_beta; // param for compression
     // float attr_sel = 0.001;
@@ -260,13 +260,14 @@ int main(int argc, char *argv[]) {
     n_centroids = gamma;
 
     std::vector<int> metadata = load_ab(dataset, gamma, assignment_type, N);
-    std::vector<std::string> metadata_strings = load_metadata_strings("./siftsmall/base_attrs.txt", N);
+    std::vector<std::string> metadata_strings = load_metadata_strings("../amazon/amazon_base_labels.txt", N);
     metadata.resize(N);
+    metadata_strings.resize(N);
     assert(N == metadata.size());
     printf("[%.3f s] Loaded metadata, %ld attr's found\n", 
         elapsed() - t0, metadata.size());
 
-   
+    
 
     size_t nq;
     float* xq;
@@ -281,9 +282,9 @@ int main(int argc, char *argv[]) {
         // load_data(dataset, is_base, &d2, &nq, xq);
         std::string filename = get_file_name(dataset, is_base);
         //xq = fvecs_read(filename.c_str(), &d2, &nq);
-        xq = fbin_read("./siftsmall/siftsmall_query.bin", &d2, &nq);
+        xq = fbin_read("../amazon/amazon_query.fbin", &d2, &nq);
 
-        assert(d == d2 || !"query does not have same dimension as expected 128");
+        assert(d == d2 || !"query does not have same dimension as expected");
         if (d != d2) {
             d = d2;
         }
@@ -293,8 +294,12 @@ int main(int argc, char *argv[]) {
         aq = load_aq(dataset, n_centroids, alpha, N);
         printf("[%.3f s] Loaded %ld %s queries\n", elapsed() - t0, nq, dataset.c_str());
 
-        aq_strings = load_metadata_strings("./siftsmall/query_attrs.txt", nq);
+        aq_strings = load_metadata_strings("../amazon/amazon_query_labels.txt", nq);
     }
+
+    nq = 10;
+    //aq.resize(10);
+    aq_strings.resize(10);
     // nq = 1;
     int gt_size = 100;
     if (dataset=="sift1M_test" || dataset=="paper") {
@@ -337,7 +342,7 @@ int main(int argc, char *argv[]) {
         bool is_base = 1;
         std::string filename = get_file_name(dataset, is_base);
         //float* xb = fvecs_read(filename.c_str(), &d2, &nb);
-        float* xb = fbin_read("./siftsmall/siftsmall_base.bin", &d2, &nb);
+        float* xb = fbin_read("../amazon/amazon_base.fbin", &d2, &nb);
         assert(d == d2 || !"dataset does not dim 128 as expected");
         printf("[%.3f s] Loaded base vectors from file: %s\n", elapsed() - t0, filename.c_str());
 
@@ -533,8 +538,8 @@ int main(int argc, char *argv[]) {
         std::cout << "metadata_strings size: " << metadata_strings.size() << std::endl;
         for (int xq = 0; xq < nq; xq++) {
             for (int xb = 0; xb < N; xb++) {
-                SingleLabel label_base = SingleLabel(metadata_strings[xb]);
-                SingleLabel label_query = SingleLabel(aq_strings[xq]);
+                MultiLabel label_base = MultiLabel(metadata_strings[xb]);
+                MultiLabel label_query = MultiLabel(aq_strings[xq]);
                 filter_ids_map[xq * N + xb] = (bool) (label_query <= label_base);
             }
         }
@@ -548,7 +553,8 @@ int main(int argc, char *argv[]) {
         printf("[%.3f s] Query results (vector ids, then distances):\n",
                elapsed() - t0);
 
-        int nq_print = std::min(5, (int) nq);
+        int nq_print = std::min(5, (int) nq); 
+        
         for (int i = 0; i < nq_print; i++) {
             printf("query %2d nn's (%s): ", i, aq_strings[i].c_str());
             for (int j = 0; j < k; j++) {

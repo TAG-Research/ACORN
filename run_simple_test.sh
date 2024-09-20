@@ -7,7 +7,7 @@ export debugSearchFlag=0
 
 #make -C build -j faiss
 #make -C build utils
-#make -C build test_acorn
+make -C build test_acorn
 
 
 

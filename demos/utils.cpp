@@ -16,7 +16,14 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <set>
+#include <stack>
+#include <regex>
 // added these
 #include <faiss/Index.h>
 #include <stdlib.h>
@@ -112,38 +119,95 @@ float* fvecs_read(const char* fname, size_t* d_out, size_t* n_out) {
     return x;
 }
 
+
+
+#define PARTSIZE 10000000
+#define ALIGNMENT 512
+template <class T> T *aligned_malloc(const size_t n, const size_t alignment)
+{
+#ifdef _WINDOWS
+    return (T *)_aligned_malloc(sizeof(T) * n, alignment);
+#else
+    return static_cast<T *>(aligned_alloc(alignment, sizeof(T) * n));
+#endif
+}
+
+template <typename T> inline int get_num_parts(const char *filename)
+{
+    std::ifstream reader;
+    reader.exceptions(std::ios::failbit | std::ios::badbit);
+    reader.open(filename, std::ios::binary);
+    std::cout << "Reading bin file " << filename << " ...\n";
+    int npts_i32, ndims_i32;
+    reader.read((char *)&npts_i32, sizeof(int));
+    reader.read((char *)&ndims_i32, sizeof(int));
+    std::cout << "#pts = " << npts_i32 << ", #dims = " << ndims_i32 << std::endl;
+    reader.close();
+    uint32_t num_parts =
+        (npts_i32 % PARTSIZE) == 0 ? npts_i32 / PARTSIZE : (uint32_t)std::floor(npts_i32 / PARTSIZE) + 1;
+    std::cout << "Number of parts: " << num_parts << std::endl;
+    return num_parts;
+}
+
+template <typename T>
+inline void load_bin_as_float(const char *filename, float *&data, size_t &npts, size_t &ndims, int part_num)
+{
+     try {
+    std::ifstream reader;
+    reader.exceptions(std::ios::failbit | std::ios::badbit);
+    reader.open(filename, std::ios::binary);
+    
+    std::cout << "Reading bin file " << filename << " ...\n";
+    int npts_i32, ndims_i32;
+    reader.read((char *)&npts_i32, sizeof(int));
+    reader.read((char *)&ndims_i32, sizeof(int));
+    uint64_t start_id = part_num * PARTSIZE;
+    uint64_t end_id = (std::min)(start_id + PARTSIZE, (uint64_t)npts_i32);
+    npts = end_id - start_id;
+    ndims = (uint64_t)ndims_i32;
+    std::cout << "#pts in part = " << npts << ", #dims = " << ndims << ", size = " << npts * ndims * sizeof(T) << "B"
+              << std::endl;
+
+    reader.seekg(start_id * ndims * sizeof(T) + 2 * sizeof(uint32_t), std::ios::beg);
+    T *data_T = new T[npts * ndims];
+    reader.read((char *)data_T, sizeof(T) * npts * ndims);
+    std::cout << "Finished reading part of the bin file." << std::endl;
+    reader.close();
+    data = aligned_malloc<float>(npts * ndims, ALIGNMENT);
+#pragma omp parallel for schedule(dynamic, 32768)
+    for (int64_t i = 0; i < (int64_t)npts; i++)
+    {
+        for (int64_t j = 0; j < (int64_t)ndims; j++)
+        {
+            float cur_val_float = (float)data_T[i * ndims + j];
+            std::memcpy((char *)(data + i * ndims + j), (char *)&cur_val_float, sizeof(float));
+        }
+    }
+    delete[] data_T;
+    std::cout << "Finished converting part data to float." << std::endl;
+    } catch (const std::ios_base::failure& e) {
+        std::cerr << "I/O error: " << e.what() << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
+    }
+}
+
 float* fbin_read(const char* fname, size_t* d_out, size_t* n_out) {
-    FILE* f = fopen(fname, "rb"); // Open in binary mode
-    if (!f) {
-        fprintf(stderr, "could not open %s\n", fname);
-        perror("");
-        abort();
+    float *base_data = nullptr;
+    int num_parts = get_num_parts<float>(fname);
+ 
+    size_t npoints, dim;
+    for (int p = 0; p < num_parts; p++)
+    {
+        size_t start_id = p * PARTSIZE;
+        load_bin_as_float<float>(fname, base_data, npoints, dim, p);
+        size_t end_id = start_id + npoints;
+
+        *d_out = dim;
+        *n_out = npoints;
     }
 
-    int N, D;
-    size_t read_items = fread(&N, sizeof(int), 1, f); // Read N
-    assert(read_items == 1 || !"could not read N");
-
-    read_items = fread(&D, sizeof(int), 1, f); // Read D
-    assert(read_items == 1 || !"could not read D");
-
-    printf("Loading from binary file: %s\n", fname);
-    printf("Number of points (N): %d\n", N);
-    printf("Dimension (D): %d\n", D);
-
-    *d_out = D;
-    *n_out = N;
-
-    // Allocate memory for all vectors
-    float* x = new float[N * D];
-
-    // Read all vector data
-    size_t nr = fread(x, sizeof(float), N * D, f);
-    assert(nr == N * D || !"could not read all vector data");
-
-    fclose(f);
-    return x;
-
+    return base_data;
 }
 
 // not very clean, but works as long as sizeof(int) == sizeof(float)
@@ -616,6 +680,315 @@ std::vector<faiss::idx_t> load_gt(std::string dataset, int n_centroids, int alph
 
 
 
+class MultiLabel {
+public:
+    // Constructors
+    MultiLabel() {}
+    static MultiLabel fromBase(const std::string& base_label) {
+        MultiLabel ml;
+        ml.parseBaseLabel(base_label);
+        return ml;
+    }
+    static MultiLabel fromQuery(std::string& query_label) {
+        MultiLabel ml;
+        ml.raw_query = preprocessQueryLabel(query_label);
+        return ml;
+    }
+
+    // Method to check if the query label is a subset of the base label
+    bool isSubsetOf(const MultiLabel& base_label) const {
+        auto tokens = tokenizeQueryLabel(raw_query);
+        size_t index = 0;
+        Node* expression_tree = parseExpression(tokens, index);
+        if (index != tokens.size()) {
+            throw std::invalid_argument("Unexpected token: " + tokens[index]);
+        }
+        bool result = evaluateExpression(expression_tree, base_label.label_map);
+        deleteTree(expression_tree);
+        return result;
+    }
+    std::string raw_query;  // For query labels
+
+private:
+    std::map<std::string, std::set<std::string>> label_map;  // For base labels
+
+    // Parsing base labels
+    void parseBaseLabel(const std::string& base_label) {
+        std::stringstream ss(base_label);
+        std::string item;
+        while (std::getline(ss, item, ',')) {
+            auto pos = item.find('=');
+            if (pos != std::string::npos) {
+                std::string key = trim(item.substr(0, pos));
+                std::string value = trim(item.substr(pos + 1));
+                label_map[key].insert(value);
+            }
+        }
+    }
+    static void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+        if (from.empty())
+            return;
+        size_t start_pos = 0;
+        while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+            str.replace(start_pos, from.length(), to);
+            start_pos += to.length();
+        }
+    }
+
+    // Preprocessing query labels to add parentheses
+    static std::string preprocessQueryLabel(std::string& query_label) {
+        std::string normalized_label = query_label;
+        // Normalize operators to '&' and '|'
+        std::regex and_regex("&");
+        std::regex or_regex("\\|");
+        // No need to replace since we're using single '&' and '|'
+        // Tokenize the normalized label
+        std::vector<std::string> tokens;
+        std::regex token_regex(R"((\||&|\(|\)|[^\|\&\s]+))");
+        auto words_begin = std::sregex_iterator(normalized_label.begin(), normalized_label.end(), token_regex);
+        auto words_end = std::sregex_iterator();
+
+        for (std::sregex_iterator it = words_begin; it != words_end; ++it) {
+            tokens.push_back(trim(it->str()));
+        }
+
+        // Insert parentheses where needed
+        tokens = insertParentheses(tokens);
+
+        // Reconstruct the query label from tokens
+        std::string preprocessed_query;
+        for (const auto& token : tokens) {
+            preprocessed_query += token;
+        }
+
+        return preprocessed_query;
+    }
+
+    // Function to insert parentheses based on operator precedence
+    static std::vector<std::string> insertParentheses(const std::vector<std::string>& tokens) {
+        std::vector<std::string> output;
+        std::stack<std::string> operators;
+        std::stack<std::string> operands;
+
+        // Operator precedence: '&' lower than '|'
+        std::map<std::string, int> precedence = {
+            {"&", 1},
+            {"|", 2}
+        };
+
+        // Shunting-yard algorithm to process the tokens
+        for (size_t i = 0; i < tokens.size(); ++i) {
+            std::string token = tokens[i];
+            if (token == "&" || token == "|") {
+                while (!operators.empty() && operators.top() != "(" &&
+                       precedence[operators.top()] >= precedence[token]) {
+                    std::string op = operators.top();
+                    operators.pop();
+
+                    if (operands.size() < 2) {
+                        throw std::invalid_argument("Invalid expression");
+                    }
+
+                    std::string right = operands.top(); operands.pop();
+                    std::string left = operands.top(); operands.pop();
+
+                    // Add parentheses if necessary
+                    if (precedence[op] < precedence[token]) {
+                        left = "(" + left + ")";
+                    }
+
+                    std::string expr = left + op + right;
+                    operands.push(expr);
+                }
+                operators.push(token);
+            } else if (token == "(") {
+                operators.push(token);
+            } else if (token == ")") {
+                while (!operators.empty() && operators.top() != "(") {
+                    std::string op = operators.top();
+                    operators.pop();
+
+                    if (operands.size() < 2) {
+                        throw std::invalid_argument("Invalid expression");
+                    }
+
+                    std::string right = operands.top(); operands.pop();
+                    std::string left = operands.top(); operands.pop();
+
+                    std::string expr = left + op + right;
+                    operands.push(expr);
+                }
+                if (!operators.empty()) {
+                    operators.pop(); // Remove '('
+                } else {
+                    throw std::invalid_argument("Mismatched parentheses");
+                }
+            } else {
+                operands.push(token);
+            }
+        }
+
+        while (!operators.empty()) {
+            if (operators.top() == "(" || operators.top() == ")") {
+                throw std::invalid_argument("Mismatched parentheses");
+            }
+            std::string op = operators.top();
+            operators.pop();
+
+            if (operands.size() < 2) {
+                throw std::invalid_argument("Invalid expression");
+            }
+
+            std::string right = operands.top(); operands.pop();
+            std::string left = operands.top(); operands.pop();
+
+            std::string expr = left + op + right;
+            operands.push(expr);
+        }
+
+        // The final expression is on top of the stack
+        if (operands.size() != 1) {
+            throw std::invalid_argument("Invalid expression");
+        }
+        std::string final_expr = operands.top(); operands.pop();
+
+        // Tokenize the final expression to rebuild the tokens vector
+        std::vector<std::string> final_tokens;
+        std::regex final_token_regex(R"((\||&|\(|\)|[^\|\&\s]+))");
+        auto final_words_begin = std::sregex_iterator(final_expr.begin(), final_expr.end(), final_token_regex);
+        auto final_words_end = std::sregex_iterator();
+
+        for (std::sregex_iterator it = final_words_begin; it != final_words_end; ++it) {
+            final_tokens.push_back(it->str());
+        }
+
+        return final_tokens;
+    }
+
+    // Tokenizing query labels
+    static std::vector<std::string> tokenizeQueryLabel(const std::string& query_label) {
+        std::vector<std::string> tokens;
+        std::regex token_regex(R"((\||&|\(|\)|[^\|\&\s]+))");
+        auto words_begin = std::sregex_iterator(query_label.begin(), query_label.end(), token_regex);
+        auto words_end = std::sregex_iterator();
+
+        for (std::sregex_iterator it = words_begin; it != words_end; ++it) {
+            tokens.push_back(it->str());
+        }
+
+        return tokens;
+    }
+
+    // Expression tree node
+    struct Node {
+        std::string value;
+        Node* left;
+        Node* right;
+        Node(const std::string& val) : value(val), left(nullptr), right(nullptr) {}
+    };
+
+    // Parsing the expression into a tree
+    Node* parseExpression(const std::vector<std::string>& tokens, size_t& index) const {
+        Node* node = parseTerm(tokens, index);
+        while (index < tokens.size() && tokens[index] == "&") {
+            std::string op = tokens[index];
+            ++index;
+            Node* right = parseTerm(tokens, index);
+            Node* new_node = new Node(op);
+            new_node->left = node;
+            new_node->right = right;
+            node = new_node;
+        }
+        return node;
+    }
+
+    Node* parseTerm(const std::vector<std::string>& tokens, size_t& index) const {
+        Node* node = parseFactor(tokens, index);
+        while (index < tokens.size() && tokens[index] == "|") {
+            std::string op = tokens[index];
+            ++index;
+            Node* right = parseFactor(tokens, index);
+            Node* new_node = new Node(op);
+            new_node->left = node;
+            new_node->right = right;
+            node = new_node;
+        }
+        return node;
+    }
+
+    Node* parseFactor(const std::vector<std::string>& tokens, size_t& index) const {
+        if (index >= tokens.size()) {
+            throw std::invalid_argument("Invalid query label syntax");
+        }
+        std::string token = tokens[index];
+        if (token == "(") {
+            ++index;
+            Node* node = parseExpression(tokens, index);
+            if (index >= tokens.size() || tokens[index] != ")") {
+                throw std::invalid_argument("Missing closing parenthesis");
+            }
+            ++index;
+            return node;
+        } else if (token != "&" && token != "|") {
+            ++index;
+            return new Node(token);
+        } else {
+            throw std::invalid_argument("Invalid token: " + token);
+        }
+    }
+
+    // Evaluating the expression tree against the base label
+    bool evaluateExpression(Node* node, const std::map<std::string, std::set<std::string>>& base_label_map) const {
+        if (!node) return false;
+
+        if (node->value == "&" || node->value == "|") {
+            bool left_result = evaluateExpression(node->left, base_label_map);
+            bool right_result = evaluateExpression(node->right, base_label_map);
+            if (node->value == "&") {
+                return left_result && right_result;
+            } else {
+                return left_result || right_result;
+            }
+        } else {
+            auto pos = node->value.find('=');
+            if (pos != std::string::npos) {
+                std::string key = trim(node->value.substr(0, pos));
+                std::string value = trim(node->value.substr(pos + 1));
+                if (value.find('|') != std::string::npos) {
+                    std::stringstream ss(value);
+                    std::string val;
+                    while (std::getline(ss, val, '|')) {
+                        if (base_label_map.count(key) && base_label_map.at(key).count(val)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                } else {
+                    return base_label_map.count(key) && base_label_map.at(key).count(value);
+                }
+            } else {
+                throw std::invalid_argument("Invalid operand: " + node->value);
+            }
+        }
+    }
+
+    // Deleting the expression tree
+    void deleteTree(Node* node) const {
+        if (!node) return;
+        deleteTree(node->left);
+        deleteTree(node->right);
+        delete node;
+    }
+
+    // Helper method to trim strings
+    static std::string trim(const std::string& str) {
+        const char* whitespace = " \t\n\r\f\v";
+        size_t start = str.find_first_not_of(whitespace);
+        if (start == std::string::npos) return "";
+        size_t end = str.find_last_not_of(whitespace);
+        return str.substr(start, end - start + 1);
+    }
+};
 
 
 
