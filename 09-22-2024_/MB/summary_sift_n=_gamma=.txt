@@ -1,0 +1,10 @@
+Start time: 16:57
+====================
+START: Running TEST_ACORN with 8 cores
+
+Usage: ./build/demos/acorn <number of vectors N> <number of queries nq> <dataset path>
+Start time: 16:58
+====================
+START: Running TEST_ACORN with 8 cores
+
+Usage: ./build/demos/acorn <number of vectors N> <number of queries nq> <dataset path>

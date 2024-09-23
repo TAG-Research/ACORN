@@ -1,0 +1,86 @@
+Start time: 19:02
+Start time: 19:04
+====================
+START: Running TEST_ACORN with 8 cores
+
+[Config] N: 10000, nq: 100, dataset_path: ../amazon/
+metadata or vector loaded from json, size: 10000
+loaded base attributes from: ./testing_data/base_attrs_sift0m_nc=12_assignment=rand.json
+loaded metadata from: ../amazon//base_labels.txt
+Number of lines loaded: 2000640
+Value of N: 10000
+[0.628 s] Loaded metadata, 10000 attributes found
+[0.000 s] Loading query vectors and attributes
+Reading bin file ../amazon//query.fbin ...
+#pts = 7119, #dims = 384
+Number of parts: 1
+Reading bin file ../amazon//query.fbin ...
+#pts in part = 7119, #dims = 384, size = 10934784B
+Finished reading part of the bin file.
+Finished converting part data to float.
+[0.012 s] Loaded query vectors from ../amazon//query.fbin
+Invalid dataset in load_aq
+loaded metadata from: ../amazon//query_labels.txt
+Number of lines loaded: 7119
+Value of N: 7119
+[0.014 s] Loaded 100 queries
+--ACORN index created
+[0.000 s] Loading database vectors
+Reading bin file ../amazon//base.fbin ...
+#pts = 2000640, #dims = 384
+Number of parts: 1
+Reading bin file ../amazon//base.fbin ...
+#pts in part = 2000640, #dims = 384, size = 3072983040B
+Finished reading part of the bin file.
+Finished converting part data to float.
+[4.033 s] Loaded base vectors from ../amazon//base.fbin
+[4.033 s] Adding vectors to indexes
+[6.263 s] Added 10000 vectors to indexes
+====================Write Index====================
+
+Start time: 19:32
+====================
+START: Running TEST_ACORN with 8 cores
+
+[Config] N: 10000, nq: 100, dataset_path: ../amazon/
+Failed to open JSON file
+Failed to parse JSON data from ./testing_data/base_attrs_sift0m_nc=1_assignment=rand.json: [json.exception.parse_error.101] parse error at line 1, column 1: syntax error while parsing value - unexpected end of input; expected '[', '{', or a literal
+terminate called after throwing an instance of 'nlohmann::detail::type_error'
+  what():  [json.exception.type_error.302] type must be array, but is null
+Start time: 19:38
+====================
+START: Running TEST_ACORN with 8 cores
+
+[Config] N: 10000, nq: 100, dataset_path: ../amazon/
+loaded metadata from: ../amazon//base_labels.txt
+Number of lines loaded: 2000640
+Value of N: 10000
+[0.290 s] Loaded metadata, 1000000 attributes found
+[0.000 s] Loading query vectors and attributes
+Reading bin file ../amazon//query.fbin ...
+#pts = 7119, #dims = 384
+Number of parts: 1
+Reading bin file ../amazon//query.fbin ...
+#pts in part = 7119, #dims = 384, size = 10934784B
+Finished reading part of the bin file.
+Finished converting part data to float.
+[0.006 s] Loaded query vectors from ../amazon//query.fbin
+Invalid dataset in load_aq
+loaded metadata from: ../amazon//query_labels.txt
+Number of lines loaded: 7119
+Value of N: 7119
+[0.007 s] Loaded 100 queries
+--ACORN index created
+[0.000 s] Loading database vectors
+Reading bin file ../amazon//base.fbin ...
+#pts = 2000640, #dims = 384
+Number of parts: 1
+Reading bin file ../amazon//base.fbin ...
+#pts in part = 2000640, #dims = 384, size = 3072983040B
+Finished reading part of the bin file.
+Finished converting part data to float.
+[1.855 s] Loaded base vectors from ../amazon//base.fbin
+[1.855 s] Adding vectors to indexes
+[2.126 s] Added 10000 vectors to indexes
+====================Write Index====================
+

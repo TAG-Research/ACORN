@@ -46,6 +46,8 @@
 #include <numeric> // for std::accumulate
 #include <cmath>   // for std::mean and std::stdev
 #include <nlohmann/json.hpp>
+#include <tsl/robin_map.h>
+#include <tsl/robin_set.h>
 // #include <format>
 // for convenience
 using json = nlohmann::json;
@@ -678,7 +680,59 @@ std::vector<faiss::idx_t> load_gt(std::string dataset, int n_centroids, int alph
 
 
 
+class MultiLabel2 {
+public:
+    tsl::robin_set<std::string> base_clause;  // For base labels 
+    std::vector<std::string> query_or_clause;  // For query labels
+    // Constructors
+    MultiLabel2() {}
+    static MultiLabel2 fromBase(const std::string& base_label) {
+        MultiLabel2 ml;
+        
+         std::istringstream new_iss(base_label);
+         std::string token;
+        while (getline(new_iss, token, ','))
+        {
+            token.erase(std::remove(token.begin(), token.end(), '\n'), token.end());
+            token.erase(std::remove(token.begin(), token.end(), '\r'), token.end());
+            ml.base_clause.insert(token);
+        }
+        return ml;
+    }
 
+
+    static MultiLabel2 fromQuery(std::string& query_label) {
+        MultiLabel2 ml;
+        std::istringstream new_iss(query_label);
+        std::string token;
+        while (getline(new_iss, token, '&'))
+        {
+            std::vector<std::string> or_clause(0);
+            std::istringstream inner_iss(token);
+            while (getline(inner_iss, token, '|'))
+            {
+ 
+                token.erase(std::remove(token.begin(), token.end(), '\n'), token.end());
+                token.erase(std::remove(token.begin(), token.end(), '\r'), token.end());
+                ml.query_or_clause.push_back(token);
+             }
+ 
+         }
+          return ml;
+    }
+
+    // Method to check if the query label is a subset of the base label
+    bool isSubsetOf(const MultiLabel2& base_label) const {
+        bool found = false;
+        for (const auto& or_clause : this->query_or_clause) {
+            if(base_label.base_clause.find(or_clause) != base_clause.end()){
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
+};
 
 class MultiLabel {
 public:
