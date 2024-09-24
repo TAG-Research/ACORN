@@ -51,7 +51,7 @@ struct Config {
     int alpha = 0;
     std::string dataset_name = "default_dataset"; // Dataset name
     int n_centroids;                // Number of centroids (gamma)
-    int searchOnly = 1;             // Search only mode
+    int searchOnly = 0;             // Search only mode
 };
 
 // Function prototypes
@@ -59,10 +59,10 @@ void parseArguments(int argc, char* argv[], Config& config);
 void loadMetadata(const Config& config, std::vector<int>& metadata, std::vector<std::string>& metadata_strings);
 void loadQueryData(const Config& config, float*& xq, std::vector<int>& aq, std::vector<std::string>& aq_strings);
 void loadGroundTruth(const Config& config, const std::vector<faiss::idx_t>& nns2);
-void addVectorsToIndexes(const Config& config, faiss::IndexHNSWFlat& base_index_HNSWFlat, faiss::IndexACORNFlat* hybrid_index_ACORNFlat);
-void writeIndexesToFiles(const Config& config, faiss::IndexHNSWFlat& base_index_HNSWFlat, faiss::IndexACORNFlat* hybrid_index_ACORNFlat);
-void printIndexStats( faiss::IndexHNSWFlat& base_index_HNSWFlat,  faiss::IndexACORNFlat* hybrid_index_ACORNFlat);
-void searchIndexes(const Config& config, faiss::IndexHNSWFlat& base_index_HNSWFlat, faiss::IndexACORNFlat* hybrid_index_ACORNFlat, float* xq, std::vector<std::string>& aq_strings, const std::vector<std::string>& metadata_strings);
+void addVectorsToIndexes(const Config& config,  faiss::IndexACORNFlat* hybrid_index_ACORNFlat);
+void writeIndexesToFiles(const Config& config,  faiss::IndexACORNFlat* hybrid_index_ACORNFlat);
+void printIndexStats(   faiss::IndexACORNFlat* hybrid_index_ACORNFlat);
+void searchIndexes(const Config& config,   faiss::IndexACORNFlat* hybrid_index_ACORNFlat, float* xq, std::vector<std::string>& aq_strings, const std::vector<std::string>& metadata_strings);
 void prepareFilterIdsMap(const Config& config, const std::vector<std::string>& aq_strings, const std::vector<std::string>& metadata_strings, std::vector<char>& filter_ids_map);
 faiss::Index* readIndexesfromFiles(const Config& config);
 // Main function
@@ -83,16 +83,12 @@ int main(int argc, char* argv[]) {
     loadQueryData(config, xq, aq, aq_strings);
 
 
-
-        // base HNSW index
-    faiss::IndexHNSWFlat base_index_HNSWFlat(config.d, config.M, 1); // gamma = 1
-    base_index_HNSWFlat.hnsw.efConstruction = config.efc; // default is 40  in HNSW.capp
-    base_index_HNSWFlat.hnsw.efSearch = config.efs; // default is 16 in HNSW.capp
     
     // ACORN-gamma
     faiss::IndexACORNFlat index_ACORNFlat(config.d, config.M, config.gamma, metadata, config.M*2);
     faiss::IndexACORNFlat *hybrid_index_ACORNFlat = &index_ACORNFlat;
     hybrid_index_ACORNFlat->acorn.efSearch = config.efs; // default is 16 HybridHNSW.capp
+    hybrid_index_ACORNFlat->acorn.efConstruction = config.efc; // default is 100 HybridHNSW.capp
     debug("ACORN index created%s\n", "");
 
 
@@ -101,19 +97,19 @@ int main(int argc, char* argv[]) {
     hybrid_index_gamma1.acorn.efSearch = config.efs; // default is 16 HybridHNSW.capp
 
     std::cout << "SearchOnly " <<  config.searchOnly << std::endl;
-    if(config.searchOnly == 1){
+    if(config.searchOnly >= 1){
         faiss::Index *index  = readIndexesfromFiles(config);
         hybrid_index_ACORNFlat = dynamic_cast<faiss::IndexACORNFlat*>(index);
-        hybrid_index_ACORNFlat->acorn.efSearch = config.efs; 
+        hybrid_index_ACORNFlat->acorn.efSearch = config.searchOnly; 
 
     }else{
-        addVectorsToIndexes(config, base_index_HNSWFlat, hybrid_index_ACORNFlat);
+        addVectorsToIndexes(config, hybrid_index_ACORNFlat);
 
-       writeIndexesToFiles(config, base_index_HNSWFlat, hybrid_index_ACORNFlat);
+       writeIndexesToFiles(config, hybrid_index_ACORNFlat);
     }
-    printIndexStats(base_index_HNSWFlat, hybrid_index_ACORNFlat);
+    printIndexStats( hybrid_index_ACORNFlat);
 
-    searchIndexes(config, base_index_HNSWFlat, hybrid_index_ACORNFlat, xq, aq_strings, metadata_strings);
+    searchIndexes(config, hybrid_index_ACORNFlat, xq, aq_strings, metadata_strings);
 
 
   
@@ -136,9 +132,12 @@ void parseArguments(int argc, char* argv[], Config& config) {
     config.base_file= argv[4];
     config.query_file= argv[5];
     config.ground_truth_file= argv[6];
-    config.searchOnly = strtoul(argv[7], NULL, 10);
+    config.efc = atoi(argv[7]);
+    config.M = atoi(argv[8]);
+    config.M_beta = config.M;
+    config.searchOnly = atoi(argv[9]);
 
-    // Optional: parse more arguments for other configurations
+     // Optional: parse more arguments for other configurations
     // For example:
     // config.gamma = atoi(argv[4]);
     // config.M = atoi(argv[5]);
@@ -198,6 +197,7 @@ void loadGroundTruth(const Config& config, const std::vector<faiss::idx_t>& nns2
     
     const std::string& gt_filename = config.dataset_path + config.ground_truth_file;
     // Open the ground truth file
+    std::cout << "GT Filename: " << gt_filename << std::endl;
     std::ifstream reader(gt_filename);
     if (!reader.is_open()) {
         std::cerr << "Error opening ground truth file " << gt_filename << std::endl;
@@ -251,7 +251,7 @@ void loadGroundTruth(const Config& config, const std::vector<faiss::idx_t>& nns2
     printf("Recall@%ld: %.3f\n", k, recall);
 }
     
-void addVectorsToIndexes(const Config& config, faiss::IndexHNSWFlat& base_index_HNSWFlat, faiss::IndexACORNFlat* hybrid_index_ACORNFlat) {
+void addVectorsToIndexes(const Config& config,  faiss::IndexACORNFlat* hybrid_index_ACORNFlat) {
     double t0 = elapsed();
     printf("[%.3f s] Loading database vectors\n", elapsed() - t0);
 
@@ -266,31 +266,25 @@ void addVectorsToIndexes(const Config& config, faiss::IndexHNSWFlat& base_index_
     printf("[%.3f s] Loaded base vectors from %s\n", elapsed() - t0, (config.dataset_path + "/base.fbin").c_str());
 
     printf("[%.3f s] Adding vectors to indexes\n", elapsed() - t0);
-    //base_index_HNSWFlat.add(config.N, xb);
-    hybrid_index_ACORNFlat->add(config.N, xb);
+     hybrid_index_ACORNFlat->add(config.N, xb);
 
     //delete[] xb;
 
     printf("[%.3f s] Added %ld vectors to indexes\n", elapsed() - t0, config.N);
 }
 
-void writeIndexesToFiles(const Config& config, faiss::IndexHNSWFlat& base_index_HNSWFlat, faiss::IndexACORNFlat* hybrid_index_ACORNFlat) {
+void writeIndexesToFiles(const Config& config,   faiss::IndexACORNFlat* hybrid_index_ACORNFlat) {
     double t0 = elapsed();
     std::cout << "====================Write Index====================\n" << std::endl;
 
     std::stringstream filepath_stream;
-    filepath_stream << config.dataset_path << "/hybrid_index_M=" << config.M << "_efc=" << config.efc << "_Mb=" << config.M_beta << "_gamma=" << config.gamma << ".index";
+    filepath_stream << config.dataset_path << "/hybrid_index_M=" << config.M << "_efc=" << config.efc << "_Mb=" << config.M_beta << "_gamma=" << config.gamma <<"_N"<< config.N<<"_M"<<config.M << ".index";
     std::string hybrid_index_path = filepath_stream.str();
 
     write_index(hybrid_index_ACORNFlat, hybrid_index_path.c_str());
     printf("[%.3f s] Wrote hybrid index to file: %s\n", elapsed() - t0, hybrid_index_path.c_str());
 
-    filepath_stream.str(std::string()); // Clear the stream
-    filepath_stream << config.dataset_path << "/base_index_M=" << config.M << "_efc=" << config.efc << ".index";
-    std::string base_index_path = filepath_stream.str();
-
-    write_index(&base_index_HNSWFlat, base_index_path.c_str());
-    printf("[%.3f s] Wrote base index to file: %s\n", elapsed() - t0, base_index_path.c_str());
+ 
 }
 
 faiss::Index* readIndexesfromFiles(const Config& config) {
@@ -298,7 +292,7 @@ faiss::Index* readIndexesfromFiles(const Config& config) {
     std::cout << "====================Read Index====================\n" << std::endl;
 
     std::stringstream filepath_stream;
-    filepath_stream << config.dataset_path << "/hybrid_index_M=" << config.M << "_efc=" << config.efc << "_Mb=" << config.M_beta << "_gamma=" << config.gamma << ".index";
+    filepath_stream << config.dataset_path << "/hybrid_index_M=" << config.M << "_efc=" << config.efc << "_Mb=" << config.M_beta << "_gamma=" << config.gamma <<"_N"<< config.N<<"_M"<<config.M << ".index";
     std::string hybrid_index_path = filepath_stream.str();
 
     printf("[%.3f s] Read hybrid index from file: %s\n", elapsed() - t0, hybrid_index_path.c_str());
@@ -307,49 +301,23 @@ faiss::Index* readIndexesfromFiles(const Config& config) {
     return index;
 }
 
-void printIndexStats( faiss::IndexHNSWFlat& base_index_HNSWFlat,  faiss::IndexACORNFlat* hybrid_index_ACORNFlat) {
-    printf("====================================\n");
-    printf("============ BASE INDEX =============\n");
-    printf("====================================\n");
-    base_index_HNSWFlat.printStats(false);
+void printIndexStats(  faiss::IndexACORNFlat* hybrid_index_ACORNFlat) {
+ 
     printf("====================================\n");
     printf("============ ACORN INDEX =============\n");
     printf("====================================\n");
     hybrid_index_ACORNFlat->printStats(false);
 }
 
-void searchIndexes(const Config& config, faiss::IndexHNSWFlat& base_index_HNSWFlat, faiss::IndexACORNFlat* hybrid_index_ACORNFlat, float* xq, std::vector<std::string>& aq_strings, const std::vector<std::string>& metadata_strings) {
+void searchIndexes(const Config& config, faiss::IndexACORNFlat* hybrid_index_ACORNFlat, float* xq, std::vector<std::string>& aq_strings, const std::vector<std::string>& metadata_strings) {
     double t0 = elapsed();
     printf("==============================================\n");
     printf("====================Search Results====================\n");
     printf("==============================================\n");
 
-    // Searching the base index
-    printf("====================HNSW INDEX====================\n");
-    printf("[%.3f s] Searching the %d nearest neighbors of %ld vectors in the index, efsearch %d\n",
-           elapsed() - t0, config.k, config.nq, base_index_HNSWFlat.hnsw.efSearch);
 
-    std::vector<faiss::idx_t> nns(config.k * config.nq);
-    std::vector<float> dis(config.k * config.nq);
-
-    double t1 = elapsed();
-    base_index_HNSWFlat.search(config.nq, xq, config.k, dis.data(), nns.data());
-    double t2 = elapsed();
-
-    printf("[%.3f s] Query results (vector ids, then distances):\n", elapsed() - t0);
     int nq_print = std::min(5, (int)config.nq);
-    for (int i = 0; i < nq_print; i++) {
-        printf("query %2d nn's: ", i);
-        for (int j = 0; j < config.k; j++) {
-            printf("%7ld (%s) ", nns[j + i * config.k], metadata_strings[nns[j + i * config.k]].c_str());
-        }
-        printf("\n     dis: \t");
-        for (int j = 0; j < config.k; j++) {
-            printf("%7g ", dis[j + i * config.k]);
-        }
-        printf("\n");
-    }
-    printf("[%.3f s] *** Query time: %f\n", elapsed() - t0, t2 - t1);
+   
 
     // Searching the hybrid index
     printf("==================== ACORN INDEX ====================\n");
@@ -365,16 +333,16 @@ void searchIndexes(const Config& config, faiss::IndexHNSWFlat& base_index_HNSWFl
 
 
     std::vector<char> filter_ids_map(config.nq * config.N);
-    std::vector<MultiLabel2> query_labels(config.nq);
-    std::vector<MultiLabel2> base_labels(config.N);
+    std::vector<MultiLabel> query_labels(config.nq);
+    std::vector<MultiLabel> base_labels(config.N);
 
     for (size_t xq_idx = 0; xq_idx < config.nq; xq_idx++) {
-        query_labels[xq_idx] = MultiLabel2::fromQuery(aq_strings[xq_idx]);
+        query_labels[xq_idx] = MultiLabel::fromQuery(aq_strings[xq_idx]);
     }
 
     #pragma omp parallel for schedule(dynamic, 128)
     for (size_t xb_idx = 0; xb_idx < config.N; xb_idx++) {
-        base_labels[xb_idx] = MultiLabel2::fromBase(metadata_strings[xb_idx]);
+        base_labels[xb_idx] = MultiLabel::fromBase(metadata_strings[xb_idx]);
     }
 
     #pragma omp parallel for schedule(dynamic, 128)

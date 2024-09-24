@@ -492,10 +492,10 @@ std::vector<std::string> load_metadata_strings(std::string file_name, int N) {
     std::string line;
  
     while (std::getline(file, line)) {
-        // Replace all occurrences of '&&' with '&' and '||' with '|'
-        replaceAll(line, "&&", "&");
-        replaceAll(line, "||", "|");
         lines.push_back(line);
+        if (lines.size() == 81546) {
+            std::cout << "loaded metadata for 81545: " << lines[81545] << std::endl;
+        }
     }
     file.close();
 
