@@ -10,7 +10,7 @@ cmake -DFAISS_ENABLE_GPU=OFF -DFAISS_ENABLE_PYTHON=OFF -DBUILD_TESTING=ON -DBUIL
 make -C build -j acorn
 
 
-#../DiskANN/build/apps/utils/compute_filtered_groundtruth  --K 10 --base_file ./base.fbin --base_labels ./base_labels.txt --dist_fn l2 --data_type float --gt_file gt.bin --query_file query.fbin --query_label ./query_labels.txt 
+#../DiskANN/build/apps/utils/compute_filtered_groundtruth  --K 10 --base_file ./base.fbin --base_labels ./base_labels.txt --dist_fn l2 --data_type float --gt_file gt_1M.bin --query_file query.fbin --query_label ./query_labels.txt 
 
 ##########################################
 # TESTING SIFT1M and PAPER
