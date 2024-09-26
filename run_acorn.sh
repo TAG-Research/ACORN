@@ -20,22 +20,22 @@ now=$(date +"%m-%d-%Y")
 
  # run  
 N=1000000
-nq=10 
-gamma=12 
+nq=5000 
+gamma=12 # expansion factor
 dataset=amazon
-M=32 
-M_beta=64
-$gt = "gt_1m.bin.txt"
-$efs = 0 # 0 for build, >1 for search only
+M_beta=16 # max degree, use same M and M_beta for now
+gt="gt_1m.bin.txt"
+efc=100 # build limit
+efs=150 # search limit, 0 for build only, >1 for search only
 parent_dir=${now}_${dataset}
 mkdir ${parent_dir}
 dir=${parent_dir}/MB${M_beta}
 mkdir ${dir}
 
-TZ='America/Los_Angeles' date +"Start time: %H:%M" &>> ${dir}/summary_${dataset}_n=${N}_gamma=${gamma}.txt
+TZ='America/Los_Angeles' date +"Start time: %H:%M" &>> ${dir}/summary_${dataset}_n=${N}_nq=${nq}_efs=${efs}_gamma=${gamma}_M_beta=${M_beta}.txt
 
 
-./build/demos/acorn $N $nq ../$dataset/ . . $gt 100 $M_beta $efs  &>> ${dir}/summary_${dataset}_n=${N}_gamma=${gamma}.txt
+./build/demos/acorn $N $nq ../$dataset/ . . $gt $efc $M_beta $efs  &>> ${dir}/summary_${dataset}_n=${N}_nq=${nq}_efs=${efs}_gamma=${gamma}_M_beta=${M_beta}.txt
 
 
 
