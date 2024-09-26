@@ -680,14 +680,14 @@ std::vector<faiss::idx_t> load_gt(std::string dataset, int n_centroids, int alph
 
 
 
-class MultiLabel2 {
+class MultiLabel {
 public:
     tsl::robin_set<std::string> base_clause;  // For base labels 
-    std::vector<std::string> query_or_clause;  // For query labels
+    std::vector<std::vector<std::string>> query_clause;  // For query labels,first level is AND, second level is OR
     // Constructors
-    MultiLabel2() {}
-    static MultiLabel2 fromBase(const std::string& base_label) {
-        MultiLabel2 ml;
+    MultiLabel() {}
+    static MultiLabel fromBase(const std::string& base_label) {
+        MultiLabel ml;
         
          std::istringstream new_iss(base_label);
          std::string token;
@@ -701,346 +701,68 @@ public:
     }
 
 
-    static MultiLabel2 fromQuery(std::string& query_label) {
-        MultiLabel2 ml;
+    static MultiLabel fromQuery(std::string& query_label) {
+        MultiLabel ml;
         std::istringstream new_iss(query_label);
         std::string token;
+        std::vector<std::vector<std::string>> lbls(0);
         while (getline(new_iss, token, '&'))
         {
             std::vector<std::string> or_clause(0);
             std::istringstream inner_iss(token);
             while (getline(inner_iss, token, '|'))
             {
- 
                 token.erase(std::remove(token.begin(), token.end(), '\n'), token.end());
                 token.erase(std::remove(token.begin(), token.end(), '\r'), token.end());
-                ml.query_or_clause.push_back(token);
-             }
- 
-         }
+                or_clause.push_back(token);
+            }
+
+            ml.query_clause.push_back(or_clause);
+        }
           return ml;
     }
 
-    // Method to check if the query label is a subset of the base label
-    bool isSubsetOf(const MultiLabel2& base_label) const {
-        bool found = false;
-        for (const auto& or_clause : this->query_or_clause) {
-            if(base_label.base_clause.find(or_clause) != base_clause.end()){
-                found = true;
-                break;
+    void printQuery() {
+        for (uint32_t k = 0; k < this->query_clause.size(); k++)
+        {
+            for (uint32_t l = 0; l < this->query_clause[k].size(); l++)
+            {
+                std::cout << this->query_clause[k][l];
+                if (l < this->query_clause[k].size() - 1) {
+                    std::cout << "|";
+                }
+            }
+            if(k < this->query_clause.size() - 1) {
+            std::cout << "&";
             }
         }
-        return found;
-    }
-};
-
-class MultiLabel {
-public:
-    // Constructors
-    MultiLabel() {}
-    static MultiLabel fromBase(const std::string& base_label) {
-        MultiLabel ml;
-        ml.parseBaseLabel(base_label);
-        return ml;
-    }
-    static MultiLabel fromQuery(std::string& query_label) {
-        MultiLabel ml;
-        ml.raw_query = preprocessQueryLabel(query_label);
-        return ml;
+        std::cout << std::endl;
     }
 
     // Method to check if the query label is a subset of the base label
     bool isSubsetOf(const MultiLabel& base_label) const {
-        auto tokens = tokenizeQueryLabel(raw_query);
-        size_t index = 0;
-        Node* expression_tree = parseExpression(tokens, index);
-        if (index != tokens.size()) {
-            throw std::invalid_argument("Unexpected token: " + tokens[index]);
-        }
-        bool result = evaluateExpression(expression_tree, base_label.label_map);
-        deleteTree(expression_tree);
-        return result;
-    }
-    std::string raw_query;  // For query labels
-
-private:
-    std::map<std::string, std::set<std::string>> label_map;  // For base labels
-
-    // Parsing base labels
-    void parseBaseLabel(const std::string& base_label) {
-        std::stringstream ss(base_label);
-        std::string item;
-        while (std::getline(ss, item, ',')) {
-            auto pos = item.find('=');
-            if (pos != std::string::npos) {
-                std::string key = trim(item.substr(0, pos));
-                std::string value = trim(item.substr(pos + 1));
-                label_map[key].insert(value);
-            }
-        }
-    }
-    static void replaceAll(std::string& str, const std::string& from, const std::string& to) {
-        if (from.empty())
-            return;
-        size_t start_pos = 0;
-        while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
-            str.replace(start_pos, from.length(), to);
-            start_pos += to.length();
-        }
-    }
-
-    // Preprocessing query labels to add parentheses
-    static std::string preprocessQueryLabel(std::string& query_label) {
-        std::string normalized_label = query_label;
-        // Normalize operators to '&' and '|'
-        std::regex and_regex("&");
-        std::regex or_regex("\\|");
-        // No need to replace since we're using single '&' and '|'
-        // Tokenize the normalized label
-        std::vector<std::string> tokens;
-        std::regex token_regex(R"((\||&|\(|\)|[^\|\&\s]+))");
-        auto words_begin = std::sregex_iterator(normalized_label.begin(), normalized_label.end(), token_regex);
-        auto words_end = std::sregex_iterator();
-
-        for (std::sregex_iterator it = words_begin; it != words_end; ++it) {
-            tokens.push_back(trim(it->str()));
-        }
-
-        // Insert parentheses where needed
-        tokens = insertParentheses(tokens);
-
-        // Reconstruct the query label from tokens
-        std::string preprocessed_query;
-        for (const auto& token : tokens) {
-            preprocessed_query += token;
-        }
-
-        return preprocessed_query;
-    }
-
-    // Function to insert parentheses based on operator precedence
-    static std::vector<std::string> insertParentheses(const std::vector<std::string>& tokens) {
-        std::vector<std::string> output;
-        std::stack<std::string> operators;
-        std::stack<std::string> operands;
-
-        // Operator precedence: '&' lower than '|'
-        std::map<std::string, int> precedence = {
-            {"&", 1},
-            {"|", 2}
-        };
-
-        // Shunting-yard algorithm to process the tokens
-        for (size_t i = 0; i < tokens.size(); ++i) {
-            std::string token = tokens[i];
-            if (token == "&" || token == "|") {
-                while (!operators.empty() && operators.top() != "(" &&
-                       precedence[operators.top()] >= precedence[token]) {
-                    std::string op = operators.top();
-                    operators.pop();
-
-                    if (operands.size() < 2) {
-                        throw std::invalid_argument("Invalid expression");
+            bool pass = true;
+            for (uint32_t k = 0; k < this->query_clause.size(); k++)
+            {
+                // check OR clause inside AND clause
+                bool or_pass = false;
+                for (uint32_t l = 0; l < this->query_clause[k].size(); l++)
+                {
+                    if (base_label.base_clause.find(this->query_clause[k][l]) != base_label.base_clause.end())
+                    {
+                        or_pass = true;
+                        break;
                     }
-
-                    std::string right = operands.top(); operands.pop();
-                    std::string left = operands.top(); operands.pop();
-
-                    // Add parentheses if necessary
-                    if (precedence[op] < precedence[token]) {
-                        left = "(" + left + ")";
-                    }
-
-                    std::string expr = left + op + right;
-                    operands.push(expr);
                 }
-                operators.push(token);
-            } else if (token == "(") {
-                operators.push(token);
-            } else if (token == ")") {
-                while (!operators.empty() && operators.top() != "(") {
-                    std::string op = operators.top();
-                    operators.pop();
 
-                    if (operands.size() < 2) {
-                        throw std::invalid_argument("Invalid expression");
-                    }
-
-                    std::string right = operands.top(); operands.pop();
-                    std::string left = operands.top(); operands.pop();
-
-                    std::string expr = left + op + right;
-                    operands.push(expr);
+                // if any OR clause is not satisfied, then AND clause is not satisfied otherwise AND clause is satisfied
+                if (or_pass == false) {
+                    pass = false;
+                    break;
                 }
-                if (!operators.empty()) {
-                    operators.pop(); // Remove '('
-                } else {
-                    throw std::invalid_argument("Mismatched parentheses");
-                }
-            } else {
-                operands.push(token);
+                
             }
-        }
-
-        while (!operators.empty()) {
-            if (operators.top() == "(" || operators.top() == ")") {
-                throw std::invalid_argument("Mismatched parentheses");
-            }
-            std::string op = operators.top();
-            operators.pop();
-
-            if (operands.size() < 2) {
-                throw std::invalid_argument("Invalid expression");
-            }
-
-            std::string right = operands.top(); operands.pop();
-            std::string left = operands.top(); operands.pop();
-
-            std::string expr = left + op + right;
-            operands.push(expr);
-        }
-
-        // The final expression is on top of the stack
-        if (operands.size() != 1) {
-            throw std::invalid_argument("Invalid expression");
-        }
-        std::string final_expr = operands.top(); operands.pop();
-
-        // Tokenize the final expression to rebuild the tokens vector
-        std::vector<std::string> final_tokens;
-        std::regex final_token_regex(R"((\||&|\(|\)|[^\|\&\s]+))");
-        auto final_words_begin = std::sregex_iterator(final_expr.begin(), final_expr.end(), final_token_regex);
-        auto final_words_end = std::sregex_iterator();
-
-        for (std::sregex_iterator it = final_words_begin; it != final_words_end; ++it) {
-            final_tokens.push_back(it->str());
-        }
-
-        return final_tokens;
-    }
-
-    // Tokenizing query labels
-    static std::vector<std::string> tokenizeQueryLabel(const std::string& query_label) {
-        std::vector<std::string> tokens;
-        std::regex token_regex(R"((\||&|\(|\)|[^\|\&\s]+))");
-        auto words_begin = std::sregex_iterator(query_label.begin(), query_label.end(), token_regex);
-        auto words_end = std::sregex_iterator();
-
-        for (std::sregex_iterator it = words_begin; it != words_end; ++it) {
-            tokens.push_back(it->str());
-        }
-
-        return tokens;
-    }
-
-    // Expression tree node
-    struct Node {
-        std::string value;
-        Node* left;
-        Node* right;
-        Node(const std::string& val) : value(val), left(nullptr), right(nullptr) {}
-    };
-
-    // Parsing the expression into a tree
-    Node* parseExpression(const std::vector<std::string>& tokens, size_t& index) const {
-        Node* node = parseTerm(tokens, index);
-        while (index < tokens.size() && tokens[index] == "&") {
-            std::string op = tokens[index];
-            ++index;
-            Node* right = parseTerm(tokens, index);
-            Node* new_node = new Node(op);
-            new_node->left = node;
-            new_node->right = right;
-            node = new_node;
-        }
-        return node;
-    }
-
-    Node* parseTerm(const std::vector<std::string>& tokens, size_t& index) const {
-        Node* node = parseFactor(tokens, index);
-        while (index < tokens.size() && tokens[index] == "|") {
-            std::string op = tokens[index];
-            ++index;
-            Node* right = parseFactor(tokens, index);
-            Node* new_node = new Node(op);
-            new_node->left = node;
-            new_node->right = right;
-            node = new_node;
-        }
-        return node;
-    }
-
-    Node* parseFactor(const std::vector<std::string>& tokens, size_t& index) const {
-        if (index >= tokens.size()) {
-            throw std::invalid_argument("Invalid query label syntax");
-        }
-        std::string token = tokens[index];
-        if (token == "(") {
-            ++index;
-            Node* node = parseExpression(tokens, index);
-            if (index >= tokens.size() || tokens[index] != ")") {
-                throw std::invalid_argument("Missing closing parenthesis");
-            }
-            ++index;
-            return node;
-        } else if (token != "&" && token != "|") {
-            ++index;
-            return new Node(token);
-        } else {
-            throw std::invalid_argument("Invalid token: " + token);
-        }
-    }
-
-    // Evaluating the expression tree against the base label
-    bool evaluateExpression(Node* node, const std::map<std::string, std::set<std::string>>& base_label_map) const {
-        if (!node) return false;
-
-        if (node->value == "&" || node->value == "|") {
-            bool left_result = evaluateExpression(node->left, base_label_map);
-            bool right_result = evaluateExpression(node->right, base_label_map);
-            if (node->value == "&") {
-                return left_result && right_result;
-            } else {
-                return left_result || right_result;
-            }
-        } else {
-            auto pos = node->value.find('=');
-            if (pos != std::string::npos) {
-                std::string key = trim(node->value.substr(0, pos));
-                std::string value = trim(node->value.substr(pos + 1));
-                if (value.find('|') != std::string::npos) {
-                    std::stringstream ss(value);
-                    std::string val;
-                    while (std::getline(ss, val, '|')) {
-                        if (base_label_map.count(key) && base_label_map.at(key).count(val)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                } else {
-                    return base_label_map.count(key) && base_label_map.at(key).count(value);
-                }
-            } else {
-                throw std::invalid_argument("Invalid operand: " + node->value);
-            }
-        }
-    }
-
-    // Deleting the expression tree
-    void deleteTree(Node* node) const {
-        if (!node) return;
-        deleteTree(node->left);
-        deleteTree(node->right);
-        delete node;
-    }
-
-    // Helper method to trim strings
-    static std::string trim(const std::string& str) {
-        const char* whitespace = " \t\n\r\f\v";
-        size_t start = str.find_first_not_of(whitespace);
-        if (start == std::string::npos) return "";
-        size_t end = str.find_last_not_of(whitespace);
-        return str.substr(start, end - start + 1);
+        return pass;
     }
 };
 

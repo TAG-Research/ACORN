@@ -14,7 +14,7 @@ int main() {
     std::vector<std::string> query_labels = {
         "CAT=ExteriorAccessories&RATING=4|RATING=5",
         "CAT=ExteriorAccessories&RATING=5",
-        "CAT=Automotive&RATING=4|RATING=5",
+        "CAT=Automotive&RATING=4|RATING=5&CAT=ReplacementParts|CAT=ExteriorAccessories",
         "CAT=ReplacementParts&RATING=5",
         // Add more query labels as needed
     };
@@ -29,12 +29,13 @@ int main() {
     };
 
     for ( auto& query_label_str : query_labels) {
-        MultiLabel query_ml = MultiLabel::fromQuery(query_label_str);
+        MultiLabel query_label = MultiLabel::fromQuery(query_label_str);
         std::cout << "Query Label: " << query_label_str << std::endl;
-        std::cout << "Preprocessed Query: " << query_ml.raw_query << std::endl;
+        std::cout << "Preprocessed Query: " << std::endl;
+        query_label.printQuery();
         for ( auto& base_label_str : base_labels) {
             MultiLabel base_ml = MultiLabel::fromBase(base_label_str);
-            bool result = query_ml.isSubsetOf(base_ml);
+            bool result = query_label.isSubsetOf(base_ml);
             std::cout << "Base Label: " << base_label_str << std::endl;
             std::cout << "Is Subset: " << (result ? "True" : "False") << "\n" << std::endl;
         }
