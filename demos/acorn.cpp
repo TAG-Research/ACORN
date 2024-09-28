@@ -347,24 +347,20 @@ void searchIndexes(const Config& config, faiss::IndexACORNFlat* hybrid_index_ACO
 
     // Prepare filter_ids_map
     double t1_f = elapsed();
-    #pragma omp parallel for schedule(dynamic, 128)
+    //#pragma omp parallel for schedule(dynamic, 128)
     for (size_t xq_idx = 0; xq_idx < config.nq; xq_idx++) {
         for (size_t xb_idx = 0; xb_idx < config.N; xb_idx++) {
              
             filter_ids_map[xq_idx * config.N + xb_idx] =  query_labels[xq_idx].isSubsetOf(base_labels[xb_idx]);
         }
     }
+
+    hybrid_index_ACORNFlat->search(config.nq, xq, config.k, dis2.data(), nns2.data(), filter_ids_map.data());
+
     double t2_f = elapsed();
 
-    printf("[%.3f s] *** Done filter_ids_map %.3f\n", elapsed() - t0, t2_f - t1_f);
+    printf("[%.3f s] *** Done Query %.3f\n", elapsed() - t0, t2_f - t1_f);
 
-    printf("[%.3f s] *** Start search %f\n", elapsed() - t0);
-    double t1_x = elapsed();
-    hybrid_index_ACORNFlat->search(config.nq, xq, config.k, dis2.data(), nns2.data(), filter_ids_map.data());
-    double t2_x = elapsed();
-
-    printf("[%.3f s] *** Search done. Query time: %f\n", elapsed() - t0, t2_x - t1_x);
-   
    
     // print config.nq, xq, config.k, dis2.data(), nns2.data(), filter_ids_map.data()
     std::cout << "config nq: " << config.nq <<" dis size:"<< dis2.size() << "nns size:"<< nns2.size() <<"id map:"<< filter_ids_map.size() << std::endl;

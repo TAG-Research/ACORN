@@ -1,0 +1,5 @@
+Start time: 22:01
+Max threads available: 64
+[Config] N: 1000000, nq: 5000, dataset_path: ../wikichohere/
+terminate called after throwing an instance of 'std::__ios_failure'
+  what():  basic_ios::clear: iostream error

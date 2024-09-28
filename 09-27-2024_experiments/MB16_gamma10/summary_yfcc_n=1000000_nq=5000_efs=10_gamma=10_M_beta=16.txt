@@ -1,11 +1,11 @@
-Start time: 14:39
+Start time: 21:44
 Max threads available: 64
 [Config] N: 1000000, nq: 5000, dataset_path: ../yfcc/
 loaded metadata for 81545: 9,19
 loaded metadata from: ../yfcc//base_labels.txt
 Number of lines loaded: 9998928
 Value of N: 1000000
-[9.749 s] Loaded metadata, 5000000000 attributes found
+[9.860 s] Loaded metadata, 5000000000 attributes found
 [0.000 s] Loading query vectors and attributes
 Reading bin file ../yfcc//query.fbin ...
 #pts = 100000, #dims = 192
@@ -14,13 +14,13 @@ Reading bin file ../yfcc//query.fbin ...
 #pts in part = 100000, #dims = 192, size = 76800000B
 Finished reading part of the bin file.
 Finished converting part data to float.
-[0.070 s] Loaded query vectors from ../yfcc//query.fbin
+[0.079 s] Loaded query vectors from ../yfcc//query.fbin
 Invalid dataset in load_aq
 loaded metadata for 81545: 4559&90
 loaded metadata from: ../yfcc//query_labels.txt
 Number of lines loaded: 100000
 Value of N: 100000
-[0.077 s] Loaded 5000 queries
+[0.085 s] Loaded 5000 queries
 --ACORN index created
 SearchOnly 10
 ====================Read Index====================
@@ -104,14 +104,12 @@ METADATA VEC for number nodes per level
 ==============================================
 ==================== ACORN INDEX ====================
 [0.000 s] Searching the 10 nearest neighbors of 5000 vectors in the index, efsearch 10
-[0.000 s] *** Start filter_ids_map 1727473193.000
-[25.394 s] *** Done filter_ids_map 21.121
-[25.394 s] *** Start search 1727473218.000000
-[25.685 s] *** Search done. Query time: 0.290854
+[0.000 s] *** Start filter_ids_map 1727498690.000
+[379.588 s] *** Done Query 376.052
 config nq: 5000 dis size:50000nns size:50000id map:5000000000
 aq_strings size: 100000
 metadata_strings size: 9998928
-[25.685 s] Query results (vector ids, then distances):
+[379.588 s] Query results (vector ids, then distances):
 query  0 nn's (29):  814696 (5,12,29)  444786 (4,22,29,117913,32952,26736,24803,23917,23901,23210,22765,22536,21763,15298,14050,13901,13417,12396,11087,9728,9368,8515,7344,7335,6655,5867,5664,3577,3575,3185,2161,1996,1541,1439,1322,1286,908,877,537,426)  314496 (7,22,29)  178696 (10,15,29,3348)  682876 (7,14,29,40669,24232)    5353 (7,23,29)  111392 (10,21,29,181459,171295,141457,134740,99833,51819,26335,20874,13298,13074,11433,10174,6432,6098,5599,3217,493,435)  143619 (10,15,29)  346873 (1,16,29,19696,1435,850)  989411 (4,17,29,1539) 
      dis: 	  45162   48036   49224   49225   49871   52040   52257   52552   53337   54033 
 query  1 nn's (852&770):  118295 (6,14,30) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
@@ -125,4 +123,4 @@ query  4 nn's (1448&24):  481676 (7,13,24,6583,1448) -1 (Not Found) -1 (Not Foun
 GT Filename: ../yfcc/gt_1M.bin.txt
 Mismatch between number of queries in ground truth file and nns2
 Recall@10: 0.123
-[38.264 s] -----DONE-----
+[392.483 s] -----DONE-----

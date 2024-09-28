@@ -137,3 +137,4 @@ GT Filename: ../yfcc/gt_1M.bin.txt
 Mismatch between number of queries in ground truth file and nns2
 Recall@10: 0.232
 [91.050 s] -----DONE-----
+Start time: 21:44
