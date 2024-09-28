@@ -1,11 +1,11 @@
-Start time: 10:53
+Start time: 18:51
 Max threads available: 64
 [Config] N: 1000000, nq: 5000, dataset_path: ../wikicohere/
 loaded metadata for 81545: 17,285,787,596,1082,769,697,67,583,299,722,518
 loaded metadata from: ../wikicohere//base_labels.txt
 Number of lines loaded: 35000000
 Value of N: 1000000
-[14.899 s] Loaded metadata, 5000000000 attributes found
+[14.095 s] Loaded metadata, 5000000000 attributes found
 [0.000 s] Loading query vectors and attributes
 Reading bin file ../wikicohere//query.fbin ...
 #pts = 5000, #dims = 768
@@ -14,17 +14,17 @@ Reading bin file ../wikicohere//query.fbin ...
 #pts in part = 5000, #dims = 768, size = 15360000B
 Finished reading part of the bin file.
 Finished converting part data to float.
-[0.023 s] Loaded query vectors from ../wikicohere//query.fbin
+[0.021 s] Loaded query vectors from ../wikicohere//query.fbin
 Invalid dataset in load_aq
 loaded metadata from: ../wikicohere//query_labels.txt
 Number of lines loaded: 5000
 Value of N: 5000
-[0.025 s] Loaded 5000 queries
+[0.021 s] Loaded 5000 queries
 --ACORN index created
 SearchOnly 10
 ====================Read Index====================
 
-[0.000 s] Read hybrid index from file: ../wikicohere//hybrid_index_M=32_efc=40_Mb=32_gamma=12_N1000000_M32.index
+[0.000 s] Read hybrid index from file: ../wikicohere//hybrid_index_M=32_efc=100_Mb=32_gamma=12_N1000000_M32.index
 ====================================
 ============ ACORN INDEX =============
 ====================================
@@ -43,7 +43,7 @@ SearchOnly 10
 		level 3: 0.000030
 		level 4: 0.000001
 		level 5: 0.000000
-	* efConstruction: 40
+	* efConstruction: 100
 	* efSearch: 10
 	* max_level: 4
 	* entry_point: 118295
@@ -52,27 +52,27 @@ SearchOnly 10
 ========= LEVEL 0 =======
 * stats on level 0, max 112 neighbors per vertex:
    1. nb of nodes: 1000000
-   2. neighbors per node: 54.34 (54341139)
-   3. nb of reciprocal neighbors: 30.30
-   4. nb of neighbors that are also neighbor-of-neighbors: 50.24 (50241135)
+   2. neighbors per node: 76.42 (76421901)
+   3. nb of reciprocal neighbors: 32.12
+   4. nb of neighbors that are also neighbor-of-neighbors: 71.46 (71458740)
 ========= LEVEL 1 =======
 * stats on level 1, max 384 neighbors per vertex:
    1. nb of nodes: 31254
-   2. neighbors per node: 62.79 (1962550)
-   3. nb of reciprocal neighbors: 46.78
-   4. nb of neighbors that are also neighbor-of-neighbors: 55.46 (1733218)
+   2. neighbors per node: 138.63 (4332801)
+   3. nb of reciprocal neighbors: 85.97
+   4. nb of neighbors that are also neighbor-of-neighbors: 125.58 (3925019)
 ========= LEVEL 2 =======
 * stats on level 2, max 384 neighbors per vertex:
    1. nb of nodes: 978
-   2. neighbors per node: 75.69 (74020)
-   3. nb of reciprocal neighbors: 73.60
-   4. nb of neighbors that are also neighbor-of-neighbors: 75.63 (73964)
+   2. neighbors per node: 168.78 (165065)
+   3. nb of reciprocal neighbors: 155.65
+   4. nb of neighbors that are also neighbor-of-neighbors: 168.69 (164975)
 ========= LEVEL 3 =======
 * stats on level 3, max 384 neighbors per vertex:
    1. nb of nodes: 27
-   2. neighbors per node: 25.33 (684)
-   3. nb of reciprocal neighbors: 25.04
-   4. nb of neighbors that are also neighbor-of-neighbors: 25.26 (682)
+   2. neighbors per node: 25.30 (683)
+   3. nb of reciprocal neighbors: 24.67
+   4. nb of neighbors that are also neighbor-of-neighbors: 25.19 (680)
 ========= LEVEL 4 =======
 * stats on level 4, max 384 neighbors per vertex:
    1. nb of nodes: 1
@@ -80,9 +80,9 @@ SearchOnly 10
    3. nb of reciprocal neighbors: 0.00
    4. nb of neighbors that are also neighbor-of-neighbors: 0.00 (0)
 METADATA VEC for number nodes per level
-	level 0: 999591 nodes
-	level 1: 31250 nodes
-	level 2: 975 nodes
+	level 0: 999908 nodes
+	level 1: 31253 nodes
+	level 2: 977 nodes
 	level 3: 27 nodes
 	level 4: 1 nodes
 	level 5: 0 nodes
@@ -91,24 +91,24 @@ METADATA VEC for number nodes per level
 ==============================================
 ==================== ACORN INDEX ====================
 [0.000 s] Searching the 10 nearest neighbors of 5000 vectors in the index, efsearch 10
-[0.000 s] *** Start filter_ids_map 1727459637.000
-[34.760 s] *** Done filter_ids_map 25.338
-[34.761 s] *** Start search 1727459672.000000
-[34.796 s] *** Search done. Query time: 0.035618
+[0.000 s] *** Start filter_ids_map 1727488284.000
+[34.115 s] *** Done filter_ids_map 24.711
+[34.115 s] *** Start search 1727488318.000000
+[34.361 s] *** Search done. Query time: 0.245201
 config nq: 5000 dis size:50000nns size:50000id map:5000000000
 aq_strings size: 5000
 metadata_strings size: 35000000
-[34.797 s] Query results (vector ids, then distances):
-query  0 nn's (397&477):  432699 (155,206,307,1,867,473,1071,573,326,1943,173,397,54,334,67,300,30,236,243,246,734,27,401,1363,2595,189,1618,3652,46,464,1406,392,605,2157,211,1560,477,152,1642,1496,679,51,308,12,715,63,579,332,3111,108,354,737,677,2890,585,3721,185,728,1596,186) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
-     dis: 	199.396 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+[34.361 s] Query results (vector ids, then distances):
+query  0 nn's (397&477):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,468,300) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	150.908 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
 query  1 nn's (588&495):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,468,300) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
      dis: 	152.401 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
 query  2 nn's (3419&637):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,468,300) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
      dis: 	151.392 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
 query  3 nn's (1795&72):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,468,300) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
      dis: 	151.215 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
-query  4 nn's (425&0):  994273 (0,1529,3,58,332,2011,425,5,3321,1157)  388945 (425,0,1914,123,388,1152,837,1153,3450,1845,840,2686,1676,85,3390,517,3070,2679)  686119 (0,1474,5,2183,425,503,902,1194)  652952 (0,230,1313,678,233,1305,1769,425,1119,503)  222673 (373,1221,551,281,307,3026,1450,686,2328,215,723,2630,27,1766,1667,1113,0,211,1035,199,161,1305,121,351,425)  332549 (1053,1188,750,37,52,1357,3,1778,1648,723,15,425,0,55,35,2805,1636,2382,2258)  713910 (752,1053,327,869,27,3791,309,177,1352,1,2829,31,91,597,517,277,954,950,24,28,2954,90,138,2116,420,1065,1012,1572,161,407,2148,1078,1777,574,1851,367,263,425,1398,343,160,0,45,862,843,442,6,1048,455,2547,1558,318,1591,19)  672255 (206,1427,425,268,1572,1356,1268,1119,3269,604,914,1004,55,1558,0,463,1048)  730924 (643,0,553,639,723,2773,109,425,1631,1747,327,3350,722,287,1268,2553,1215,1679,892,31,2630,1037,1534,1103,3623,1730,1676,1356,1324,2006,249,662,3797,301)  852436 (0,635,425,1305,328,1511,1183,1769,6,1548,713,613,1733,2630,106) 
-     dis: 	151.419 154.257 155.278 156.076 157.429 157.805 158.225 160.853 161.052   163.2 
+query  4 nn's (425&0):  667005 (21,651,1710,3332,1272,41,425,81,1130,475,0,272) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	161.128 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
 GT Filename: ../wikicohere/gt_1m.bin.txt
-Recall@10: 0.068
-[54.985 s] -----DONE-----
+Recall@10: 0.104
+[55.497 s] -----DONE-----

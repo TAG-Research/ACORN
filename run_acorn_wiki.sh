@@ -26,7 +26,7 @@ gamma=1 # expansion factor
 dataset=wikicohere
 M_beta=16 # max degree, use same M and M_beta for now
 gt="gt_1m.bin.txt"
-efc=40 # build limit
+efc=100 # build limit
 efs=0 # search limit, 0 for build only, >1 for search only
 
 header="      N,   nq,   efc,  efs,   M,    M_beta, gamma,    recall,   query_time,   bitmap_time" 
