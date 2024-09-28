@@ -348,3 +348,4 @@ query  4 nn's (CAT=BumperStickersDecalsMagnets&RATING=4|RATING=5):  947804 (BRAN
 GT Filename: ../amazon/gt_1M.bin.txt
 Error opening ground truth file ../amazon/gt_1M.bin.txt
 [267.021 s] -----DONE-----
+Start time: 17:39

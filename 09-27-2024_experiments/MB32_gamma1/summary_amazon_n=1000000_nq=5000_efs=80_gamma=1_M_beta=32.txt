@@ -1,11 +1,11 @@
-Start time: 13:51
+Start time: 17:35
 Max threads available: 64
 [Config] N: 1000000, nq: 5000, dataset_path: ../amazon/
 loaded metadata for 81545: BRAND=GTGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5
 loaded metadata from: ../amazon//base_labels.txt
 Number of lines loaded: 2000640
 Value of N: 1000000
-[8.820 s] Loaded metadata, 5000000000 attributes found
+[8.725 s] Loaded metadata, 5000000000 attributes found
 [0.000 s] Loading query vectors and attributes
 Reading bin file ../amazon//query.fbin ...
 #pts = 7119, #dims = 384
@@ -14,12 +14,12 @@ Reading bin file ../amazon//query.fbin ...
 #pts in part = 7119, #dims = 384, size = 10934784B
 Finished reading part of the bin file.
 Finished converting part data to float.
-[0.016 s] Loaded query vectors from ../amazon//query.fbin
+[0.023 s] Loaded query vectors from ../amazon//query.fbin
 Invalid dataset in load_aq
 loaded metadata from: ../amazon//query_labels.txt
 Number of lines loaded: 7119
 Value of N: 7119
-[0.016 s] Loaded 5000 queries
+[0.024 s] Loaded 5000 queries
 --ACORN index created
 SearchOnly 80
 ====================Read Index====================
@@ -52,27 +52,27 @@ SearchOnly 80
 ========= LEVEL 0 =======
 * stats on level 0, max 112 neighbors per vertex:
    1. nb of nodes: 1000000
-   2. neighbors per node: 82.92 (82915297)
-   3. nb of reciprocal neighbors: 58.09
-   4. nb of neighbors that are also neighbor-of-neighbors: 81.18 (81178531)
+   2. neighbors per node: 82.89 (82894638)
+   3. nb of reciprocal neighbors: 58.07
+   4. nb of neighbors that are also neighbor-of-neighbors: 81.16 (81157090)
 ========= LEVEL 1 =======
 * stats on level 1, max 384 neighbors per vertex:
    1. nb of nodes: 31254
-   2. neighbors per node: 183.47 (5734281)
-   3. nb of reciprocal neighbors: 169.42
-   4. nb of neighbors that are also neighbor-of-neighbors: 183.30 (5728979)
+   2. neighbors per node: 183.48 (5734462)
+   3. nb of reciprocal neighbors: 169.43
+   4. nb of neighbors that are also neighbor-of-neighbors: 183.31 (5729113)
 ========= LEVEL 2 =======
 * stats on level 2, max 384 neighbors per vertex:
    1. nb of nodes: 978
-   2. neighbors per node: 187.25 (183128)
-   3. nb of reciprocal neighbors: 184.61
-   4. nb of neighbors that are also neighbor-of-neighbors: 186.87 (182755)
+   2. neighbors per node: 187.10 (182979)
+   3. nb of reciprocal neighbors: 184.44
+   4. nb of neighbors that are also neighbor-of-neighbors: 186.72 (182617)
 ========= LEVEL 3 =======
 * stats on level 3, max 384 neighbors per vertex:
    1. nb of nodes: 27
    2. neighbors per node: 25.33 (684)
-   3. nb of reciprocal neighbors: 24.89
-   4. nb of neighbors that are also neighbor-of-neighbors: 25.11 (678)
+   3. nb of reciprocal neighbors: 24.81
+   4. nb of neighbors that are also neighbor-of-neighbors: 25.07 (677)
 ========= LEVEL 4 =======
 * stats on level 4, max 384 neighbors per vertex:
    1. nb of nodes: 1
@@ -80,8 +80,8 @@ SearchOnly 80
    3. nb of reciprocal neighbors: 0.00
    4. nb of neighbors that are also neighbor-of-neighbors: 0.00 (0)
 METADATA VEC for number nodes per level
-	level 0: 999684 nodes
-	level 1: 31246 nodes
+	level 0: 999666 nodes
+	level 1: 31250 nodes
 	level 2: 977 nodes
 	level 3: 27 nodes
 	level 4: 1 nodes
@@ -91,24 +91,25 @@ METADATA VEC for number nodes per level
 ==============================================
 ==================== ACORN INDEX ====================
 [0.000 s] Searching the 10 nearest neighbors of 5000 vectors in the index, efsearch 80
-[0.000 s] *** Start filter_ids_map 1727470286.000
-[16.695 s] *** Done filter_ids_map 13.781
-[16.695 s] *** Start search 1727470303.000000
-[17.021 s] *** Search done. Query time: 0.325832
+[0.000 s] *** Start filter_ids_map 1727483766.000
+[16.929 s] *** Done filter_ids_map 14.007
+[16.929 s] *** Start search 1727483783.000000
+[17.315 s] *** Search done. Query time: 0.385375
 config nq: 5000 dis size:50000nns size:50000id map:5000000000
 aq_strings size: 7119
 metadata_strings size: 2000640
-[17.021 s] Query results (vector ids, then distances):
+[17.315 s] Query results (vector ids, then distances):
 query  0 nn's (CAT=ExteriorAccessories):  947804 (BRAND=AKWallArt,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  974846 (BRAND=Tallew,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=3)  537973 (BRAND=VisionSigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=3)  512423 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  261674 (BRAND=WOKNOW,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  441787 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  252823 (BRAND=Generic,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  369312 (BRAND=AKWallArt,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=3)  757875 (BRAND=HZGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Magnets,RATING=4)  182389 (BRAND=Mycustomvinyl,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5) 
      dis: 	0.726577 0.813061 0.813929 0.817011 0.826604 0.831042 0.843287 0.844991 0.858033 0.860469 
-query  1 nn's (CAT=ExteriorAccessories&RATING=4|RATING=5):  947804 (BRAND=AKWallArt,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  512423 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)   81545 (BRAND=GTGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  261674 (BRAND=WOKNOW,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  441787 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  252823 (BRAND=Generic,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  757875 (BRAND=HZGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Magnets,RATING=4)  182389 (BRAND=Mycustomvinyl,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  418696 (BRAND=StickerCollective,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=5)   15448 (BRAND=Frienda,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=4) 
-     dis: 	0.726577 0.817011 0.822587 0.826604 0.831042 0.843287 0.858033 0.860469 0.866668 0.872413 
+query  1 nn's (CAT=ExteriorAccessories&RATING=4|RATING=5):  947804 (BRAND=AKWallArt,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  512423 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  261674 (BRAND=WOKNOW,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  441787 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  252823 (BRAND=Generic,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  757875 (BRAND=HZGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Magnets,RATING=4)  182389 (BRAND=Mycustomvinyl,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  418696 (BRAND=StickerCollective,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=5)   15448 (BRAND=Frienda,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=4)  346582 (BRAND=StickerCollective,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=4) 
+     dis: 	0.726577 0.817011 0.826604 0.831042 0.843287 0.858033 0.860469 0.866668 0.872413 0.872973 
 query  2 nn's (CAT=ExteriorAccessories&RATING=5):  947804 (BRAND=AKWallArt,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)   81545 (BRAND=GTGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  252823 (BRAND=Generic,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  182389 (BRAND=Mycustomvinyl,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  418696 (BRAND=StickerCollective,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=5)  758610 (BRAND=StickerLife,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=5)  610045 (BRAND=Gotsticker,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  581952 (BRAND=WSQ,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=5)  763470 (BRAND=IONGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  481206 (BRAND=KWH,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5) 
      dis: 	0.726577 0.822587 0.843287 0.860469 0.866668 0.891758 0.893332 0.893466 0.89625 0.898504 
-query  3 nn's (CAT=BumperStickersDecalsMagnets):  947804 (BRAND=AKWallArt,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  974846 (BRAND=Tallew,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=3)  537973 (BRAND=VisionSigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=3)  512423 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)   81545 (BRAND=GTGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  261674 (BRAND=WOKNOW,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  441787 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  252823 (BRAND=Generic,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  369312 (BRAND=AKWallArt,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=3)  757875 (BRAND=HZGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Magnets,RATING=4) 
-     dis: 	0.726577 0.813061 0.813929 0.817011 0.822587 0.826604 0.831042 0.843287 0.844991 0.858033 
-query  4 nn's (CAT=BumperStickersDecalsMagnets&RATING=4|RATING=5):  947804 (BRAND=AKWallArt,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  512423 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)   81545 (BRAND=GTGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  261674 (BRAND=WOKNOW,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  441787 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  252823 (BRAND=Generic,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  757875 (BRAND=HZGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Magnets,RATING=4)  182389 (BRAND=Mycustomvinyl,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  418696 (BRAND=StickerCollective,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=5)   15448 (BRAND=Frienda,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=4) 
-     dis: 	0.726577 0.817011 0.822587 0.826604 0.831042 0.843287 0.858033 0.860469 0.866668 0.872413 
+query  3 nn's (CAT=BumperStickersDecalsMagnets):  947804 (BRAND=AKWallArt,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  974846 (BRAND=Tallew,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=3)  537973 (BRAND=VisionSigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=3)  512423 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  261674 (BRAND=WOKNOW,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  441787 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  252823 (BRAND=Generic,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  369312 (BRAND=AKWallArt,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=3)  757875 (BRAND=HZGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Magnets,RATING=4)  182389 (BRAND=Mycustomvinyl,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5) 
+     dis: 	0.726577 0.813061 0.813929 0.817011 0.826604 0.831042 0.843287 0.844991 0.858033 0.860469 
+query  4 nn's (CAT=BumperStickersDecalsMagnets&RATING=4|RATING=5):  947804 (BRAND=AKWallArt,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  512423 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  261674 (BRAND=WOKNOW,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  441787 (BRAND=NepaDesigns,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=4)  252823 (BRAND=Generic,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  757875 (BRAND=HZGraphics,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Magnets,RATING=4)  182389 (BRAND=Mycustomvinyl,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=Decals,RATING=5)  418696 (BRAND=StickerCollective,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=5)   15448 (BRAND=Frienda,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=4)  346582 (BRAND=StickerCollective,CAT=Automotive,CAT=ExteriorAccessories,CAT=BumperStickersDecalsMagnets,CAT=BumperStickers,RATING=4) 
+     dis: 	0.726577 0.817011 0.826604 0.831042 0.843287 0.858033 0.860469 0.866668 0.872413 0.872973 
 GT Filename: ../amazon/gt_1M.bin.txt
-Error opening ground truth file ../amazon/gt_1M.bin.txt
-[30.499 s] -----DONE-----
+Mismatch between number of queries in ground truth file and nns2
+Recall@10: 0.840
+[30.708 s] -----DONE-----

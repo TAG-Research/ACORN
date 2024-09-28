@@ -43,7 +43,7 @@ for M_beta in 16 32 64; do
             efs=0
             TZ='America/Los_Angeles' date +"Start time: %H:%M" &>> ${dir}/summary_${dataset}_n=${N}_nq=${nq}_efs=${efs}_gamma=${gamma}_M_beta=${M_beta}.txt
             echo "Running acorn with N=${N}, nq=${nq}, efc=${efc} efs=${efs}, M=${M_beta}, M_beta=${M_beta}, gamma=${gamma}"
-            ./build/demos/acorn $N $nq ../$dataset/ . . $gt $efc $M_beta $efs &>> ${dir}/summary_${dataset}_n=${N}_nq=${nq}_efs=${efs}_gamma=${gamma}_M_beta=${M_beta}.txt
+            #./build/demos/acorn $N $nq ../$dataset/ . . $gt $efc $M_beta $efs &>> ${dir}/summary_${dataset}_n=${N}_nq=${nq}_efs=${efs}_gamma=${gamma}_M_beta=${M_beta}.txt
             for efs in 10 20 40 80 150; do
                 nq=5000
                 txtfile=${dir}/summary_${dataset}_n=${N}_nq=${nq}_efs=${efs}_gamma=${gamma}_M_beta=${M_beta}.txt
