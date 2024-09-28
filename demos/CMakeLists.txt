@@ -104,7 +104,7 @@ target_link_libraries(utils PRIVATE faiss)
 # add_executable(test_laion_arb_pred EXCLUDE_FROM_ALL test_laion_arb_pred.cpp)
 # target_link_libraries(test_laion_arb_pred PRIVATE faiss)
 
-include_directories(${CMAKE_SOURCE_DIR}/third_party/robin-map/include)
+include_directories(${CMAKE_SOURCE_DIR}/third_party/robin-map/)
 
 
 add_executable(test_acorn EXCLUDE_FROM_ALL test_acorn.cpp)
@@ -114,6 +114,7 @@ target_link_libraries(test_acorn PRIVATE faiss)
 add_executable(acorn EXCLUDE_FROM_ALL acorn.cpp)
 target_include_directories(acorn PUBLIC ${nlohmann_json_SOURCE_DIR}/include)
 target_link_libraries(acorn PRIVATE faiss)
+ 
 
 add_executable(label EXCLUDE_FROM_ALL MutiLabel.cpp)
 target_include_directories(label PUBLIC ${nlohmann_json_SOURCE_DIR}/include)

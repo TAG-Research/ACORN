@@ -1,0 +1,139 @@
+Start time: 14:38
+Max threads available: 64
+[Config] N: 1000000, nq: 5000, dataset_path: ../yfcc/
+loaded metadata for 81545: 9,19
+loaded metadata from: ../yfcc//base_labels.txt
+Number of lines loaded: 9998928
+Value of N: 1000000
+[9.785 s] Loaded metadata, 5000000000 attributes found
+[0.000 s] Loading query vectors and attributes
+Reading bin file ../yfcc//query.fbin ...
+#pts = 100000, #dims = 192
+Number of parts: 1
+Reading bin file ../yfcc//query.fbin ...
+#pts in part = 100000, #dims = 192, size = 76800000B
+Finished reading part of the bin file.
+Finished converting part data to float.
+[0.074 s] Loaded query vectors from ../yfcc//query.fbin
+Invalid dataset in load_aq
+loaded metadata for 81545: 4559&90
+loaded metadata from: ../yfcc//query_labels.txt
+Number of lines loaded: 100000
+Value of N: 100000
+[0.084 s] Loaded 5000 queries
+--ACORN index created
+SearchOnly 0
+[0.000 s] Loading database vectors
+Reading bin file ../yfcc//base.fbin ...
+#pts = 10000000, #dims = 192
+Number of parts: 1
+Reading bin file ../yfcc//base.fbin ...
+#pts in part = 10000000, #dims = 192, size = 7680000000B
+Finished reading part of the bin file.
+Finished converting part data to float.
+[4.884 s] Loaded base vectors from ../yfcc//base.fbin
+[4.884 s] Adding vectors to indexes
+[53.418 s] Added 1000000 vectors to indexes
+====================Write Index====================
+
+[1.195 s] Wrote hybrid index to file: ../yfcc//hybrid_index_M=16_efc=100_Mb=16_gamma=12_N1000000_M16.index
+====================================
+============ ACORN INDEX =============
+====================================
+========= METADATA =======
+	* cumulative max num neighbors per level
+		indx 0: 0
+		indx 1: 56
+		indx 2: 248
+		indx 3: 440
+		indx 4: 632
+		indx 5: 824
+		indx 6: 1016
+		indx 7: 1208
+	* level probabilities
+		level 0: 0.937500
+		level 1: 0.058594
+		level 2: 0.003662
+		level 3: 0.000229
+		level 4: 0.000014
+		level 5: 0.000001
+		level 6: 0.000000
+		level 7: 0.000000
+	* efConstruction: 100
+	* efSearch: 100
+	* max_level: 5
+	* entry_point: 118295
+	* gamma: 12
+========= LEVEL STATS OF ACORN =======
+========= LEVEL 0 =======
+* stats on level 0, max 56 neighbors per vertex:
+   1. nb of nodes: 1000000
+   2. neighbors per node: 40.56 (40555559)
+   3. nb of reciprocal neighbors: 24.68
+   4. nb of neighbors that are also neighbor-of-neighbors: 36.41 (36412652)
+========= LEVEL 1 =======
+* stats on level 1, max 192 neighbors per vertex:
+   1. nb of nodes: 62403
+   2. neighbors per node: 133.59 (8336274)
+   3. nb of reciprocal neighbors: 79.93
+   4. nb of neighbors that are also neighbor-of-neighbors: 130.08 (8117246)
+========= LEVEL 2 =======
+* stats on level 2, max 192 neighbors per vertex:
+   1. nb of nodes: 3903
+   2. neighbors per node: 146.08 (570158)
+   3. nb of reciprocal neighbors: 117.12
+   4. nb of neighbors that are also neighbor-of-neighbors: 145.75 (568844)
+========= LEVEL 3 =======
+* stats on level 3, max 192 neighbors per vertex:
+   1. nb of nodes: 210
+   2. neighbors per node: 145.82 (30623)
+   3. nb of reciprocal neighbors: 143.66
+   4. nb of neighbors that are also neighbor-of-neighbors: 145.38 (30529)
+========= LEVEL 4 =======
+* stats on level 4, max 192 neighbors per vertex:
+   1. nb of nodes: 16
+   2. neighbors per node: 14.25 (228)
+   3. nb of reciprocal neighbors: 13.75
+   4. nb of neighbors that are also neighbor-of-neighbors: 14.06 (225)
+========= LEVEL 5 =======
+* stats on level 5, max 192 neighbors per vertex:
+   1. nb of nodes: 1
+   2. neighbors per node: 0.00 (0)
+   3. nb of reciprocal neighbors: 0.00
+   4. nb of neighbors that are also neighbor-of-neighbors: 0.00 (0)
+METADATA VEC for number nodes per level
+	level 0: 999340 nodes
+	level 1: 62392 nodes
+	level 2: 3903 nodes
+	level 3: 210 nodes
+	level 4: 16 nodes
+	level 5: 1 nodes
+	level 6: 0 nodes
+	level 7: 0 nodes
+==============================================
+====================Search Results====================
+==============================================
+==================== ACORN INDEX ====================
+[0.000 s] Searching the 10 nearest neighbors of 5000 vectors in the index, efsearch 100
+[0.000 s] *** Start filter_ids_map 1727473153.000
+[24.475 s] *** Done filter_ids_map 20.354
+[24.475 s] *** Start search 1727473178.000000
+[24.613 s] *** Search done. Query time: 0.138319
+config nq: 5000 dis size:50000nns size:50000id map:5000000000
+aq_strings size: 100000
+metadata_strings size: 9998928
+[24.614 s] Query results (vector ids, then distances):
+query  0 nn's (29):  814696 (5,12,29)  444786 (4,22,29,117913,32952,26736,24803,23917,23901,23210,22765,22536,21763,15298,14050,13901,13417,12396,11087,9728,9368,8515,7344,7335,6655,5867,5664,3577,3575,3185,2161,1996,1541,1439,1322,1286,908,877,537,426)  314496 (7,22,29)  178696 (10,15,29,3348)  682876 (7,14,29,40669,24232)    5353 (7,23,29)  111392 (10,21,29,181459,171295,141457,134740,99833,51819,26335,20874,13298,13074,11433,10174,6432,6098,5599,3217,493,435)  143619 (10,15,29)  346873 (1,16,29,19696,1435,850)  989411 (4,17,29,1539) 
+     dis: 	  45162   48036   49224   49225   49871   52040   52257   52552   53337   54033 
+query  1 nn's (852&770):  118295 (6,14,30) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	 202876 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+query  2 nn's (108758):  118295 (6,14,30) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	 208751 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+query  3 nn's (5693&2213):  118295 (6,14,30) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	 126312 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+query  4 nn's (1448&24):  481676 (7,13,24,6583,1448) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	 159289 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+GT Filename: ../yfcc/gt_1M.bin.txt
+Mismatch between number of queries in ground truth file and nns2
+Recall@10: 0.232
+[91.050 s] -----DONE-----

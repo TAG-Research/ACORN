@@ -57,7 +57,7 @@ struct Config {
 // Function prototypes
 void parseArguments(int argc, char* argv[], Config& config);
 void loadMetadata(const Config& config, std::vector<int>& metadata, std::vector<std::string>& metadata_strings);
-void loadQueryData(const Config& config, float*& xq, std::vector<int>& aq, std::vector<std::string>& aq_strings);
+size_t loadQueryData(const Config& config, float*& xq, std::vector<int>& aq, std::vector<std::string>& aq_strings);
 void loadGroundTruth(const Config& config, const std::vector<faiss::idx_t>& nns2);
 void addVectorsToIndexes(const Config& config,  faiss::IndexACORNFlat* hybrid_index_ACORNFlat);
 void writeIndexesToFiles(const Config& config,  faiss::IndexACORNFlat* hybrid_index_ACORNFlat);
@@ -68,7 +68,8 @@ faiss::Index* readIndexesfromFiles(const Config& config);
 // Main function
 int main(int argc, char* argv[]) {
     int max_threads = omp_get_max_threads();
-    std::cout << "Max threads available: " << max_threads << std::endl;    double t0 = elapsed();
+    std::cout << "Max threads available: " << max_threads << std::endl;   
+    double t0 = elapsed();
 
     Config config;
     parseArguments(argc, argv, config);
@@ -80,12 +81,12 @@ int main(int argc, char* argv[]) {
     float* xq;
     std::vector<int> aq;
     std::vector<std::string> aq_strings;
-    loadQueryData(config, xq, aq, aq_strings);
+    config.d = loadQueryData(config, xq, aq, aq_strings);
 
 
     
     // ACORN-gamma
-    faiss::IndexACORNFlat index_ACORNFlat(config.d, config.M, config.gamma, metadata, config.M*2);
+    faiss::IndexACORNFlat index_ACORNFlat(config.d, config.M, config.gamma, metadata, config.M*2, faiss::METRIC_L2);
     faiss::IndexACORNFlat *hybrid_index_ACORNFlat = &index_ACORNFlat;
     hybrid_index_ACORNFlat->acorn.efSearch = config.efs; // default is 16 HybridHNSW.capp
     hybrid_index_ACORNFlat->acorn.efConstruction = config.efc; // default is 100 HybridHNSW.capp
@@ -161,7 +162,7 @@ void loadMetadata(const Config& config, std::vector<int>& metadata, std::vector<
     printf("[%.3f s] Loaded metadata, %ld attributes found\n", elapsed() - t0, metadata.size());
 }
 
-void loadQueryData(const Config& config, float*& xq, std::vector<int>& aq, std::vector<std::string>& aq_strings) {
+size_t loadQueryData(const Config& config, float*& xq, std::vector<int>& aq, std::vector<std::string>& aq_strings) {
     double t0 = elapsed();
     printf("[%.3f s] Loading query vectors and attributes\n", elapsed() - t0);
 
@@ -173,9 +174,6 @@ void loadQueryData(const Config& config, float*& xq, std::vector<int>& aq, std::
     // Example: Load from files (to be replaced with actual file paths)
 
     xq = fbin_read((config.dataset_path + "/query.fbin").c_str(), &d2, &nq_loaded);
-    if (config.d != d2) {
-        printf("Error: query vectors have different dimensionality (%ld) than base vectors (%d)\n", d2, config.d);
-    }
 
     printf("[%.3f s] Loaded query vectors from %s\n", elapsed() - t0, (config.dataset_path + "/query.fbin").c_str());
     aq = load_aq(config.dataset_name, config.n_centroids, config.alpha, config.N);
@@ -189,6 +187,8 @@ void loadQueryData(const Config& config, float*& xq, std::vector<int>& aq, std::
     //aq_strings.resize(config.nq);
 
     printf("[%.3f s] Loaded %ld queries\n", elapsed() - t0, config.nq);
+
+    return d2;
 }
 
 void loadGroundTruth(const Config& config, const std::vector<faiss::idx_t>& nns2) {
@@ -328,14 +328,14 @@ void searchIndexes(const Config& config, faiss::IndexACORNFlat* hybrid_index_ACO
     std::vector<float> dis2(config.k * config.nq);
 
     printf("[%.3f s] *** Start filter_ids_map %.3f\n", elapsed() - t0);
-    // Prepare filter_ids_map
-    double t1_f = elapsed();
+
 
 
     std::vector<char> filter_ids_map(config.nq * config.N);
     std::vector<MultiLabel> query_labels(config.nq);
     std::vector<MultiLabel> base_labels(config.N);
 
+    #pragma omp parallel for schedule(dynamic, 128)
     for (size_t xq_idx = 0; xq_idx < config.nq; xq_idx++) {
         query_labels[xq_idx] = MultiLabel::fromQuery(aq_strings[xq_idx]);
     }
@@ -345,6 +345,8 @@ void searchIndexes(const Config& config, faiss::IndexACORNFlat* hybrid_index_ACO
         base_labels[xb_idx] = MultiLabel::fromBase(metadata_strings[xb_idx]);
     }
 
+    // Prepare filter_ids_map
+    double t1_f = elapsed();
     #pragma omp parallel for schedule(dynamic, 128)
     for (size_t xq_idx = 0; xq_idx < config.nq; xq_idx++) {
         for (size_t xb_idx = 0; xb_idx < config.N; xb_idx++) {

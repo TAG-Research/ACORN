@@ -1,0 +1,114 @@
+Start time: 10:57
+Max threads available: 64
+[Config] N: 1000000, nq: 5000, dataset_path: ../wikicohere/
+loaded metadata for 81545: 17,285,787,596,1082,769,697,67,583,299,722,518
+loaded metadata from: ../wikicohere//base_labels.txt
+Number of lines loaded: 35000000
+Value of N: 1000000
+[14.395 s] Loaded metadata, 5000000000 attributes found
+[0.000 s] Loading query vectors and attributes
+Reading bin file ../wikicohere//query.fbin ...
+#pts = 5000, #dims = 768
+Number of parts: 1
+Reading bin file ../wikicohere//query.fbin ...
+#pts in part = 5000, #dims = 768, size = 15360000B
+Finished reading part of the bin file.
+Finished converting part data to float.
+[0.028 s] Loaded query vectors from ../wikicohere//query.fbin
+Invalid dataset in load_aq
+loaded metadata from: ../wikicohere//query_labels.txt
+Number of lines loaded: 5000
+Value of N: 5000
+[0.028 s] Loaded 5000 queries
+--ACORN index created
+SearchOnly 150
+====================Read Index====================
+
+[0.000 s] Read hybrid index from file: ../wikicohere//hybrid_index_M=32_efc=40_Mb=32_gamma=12_N1000000_M32.index
+====================================
+============ ACORN INDEX =============
+====================================
+========= METADATA =======
+	* cumulative max num neighbors per level
+		indx 0: 0
+		indx 1: 112
+		indx 2: 496
+		indx 3: 880
+		indx 4: 1264
+		indx 5: 1648
+	* level probabilities
+		level 0: 0.968750
+		level 1: 0.030273
+		level 2: 0.000946
+		level 3: 0.000030
+		level 4: 0.000001
+		level 5: 0.000000
+	* efConstruction: 40
+	* efSearch: 150
+	* max_level: 4
+	* entry_point: 118295
+	* gamma: 12
+========= LEVEL STATS OF ACORN =======
+========= LEVEL 0 =======
+* stats on level 0, max 112 neighbors per vertex:
+   1. nb of nodes: 1000000
+   2. neighbors per node: 54.34 (54341139)
+   3. nb of reciprocal neighbors: 30.30
+   4. nb of neighbors that are also neighbor-of-neighbors: 50.24 (50241135)
+========= LEVEL 1 =======
+* stats on level 1, max 384 neighbors per vertex:
+   1. nb of nodes: 31254
+   2. neighbors per node: 62.79 (1962550)
+   3. nb of reciprocal neighbors: 46.78
+   4. nb of neighbors that are also neighbor-of-neighbors: 55.46 (1733218)
+========= LEVEL 2 =======
+* stats on level 2, max 384 neighbors per vertex:
+   1. nb of nodes: 978
+   2. neighbors per node: 75.69 (74020)
+   3. nb of reciprocal neighbors: 73.60
+   4. nb of neighbors that are also neighbor-of-neighbors: 75.63 (73964)
+========= LEVEL 3 =======
+* stats on level 3, max 384 neighbors per vertex:
+   1. nb of nodes: 27
+   2. neighbors per node: 25.33 (684)
+   3. nb of reciprocal neighbors: 25.04
+   4. nb of neighbors that are also neighbor-of-neighbors: 25.26 (682)
+========= LEVEL 4 =======
+* stats on level 4, max 384 neighbors per vertex:
+   1. nb of nodes: 1
+   2. neighbors per node: 0.00 (0)
+   3. nb of reciprocal neighbors: 0.00
+   4. nb of neighbors that are also neighbor-of-neighbors: 0.00 (0)
+METADATA VEC for number nodes per level
+	level 0: 999591 nodes
+	level 1: 31250 nodes
+	level 2: 975 nodes
+	level 3: 27 nodes
+	level 4: 1 nodes
+	level 5: 0 nodes
+==============================================
+====================Search Results====================
+==============================================
+==================== ACORN INDEX ====================
+[0.000 s] Searching the 10 nearest neighbors of 5000 vectors in the index, efsearch 150
+[0.000 s] *** Start filter_ids_map 1727459895.000
+[31.271 s] *** Done filter_ids_map 24.726
+[31.271 s] *** Start search 1727459926.000000
+[31.332 s] *** Search done. Query time: 0.060813
+config nq: 5000 dis size:50000nns size:50000id map:5000000000
+aq_strings size: 5000
+metadata_strings size: 35000000
+[31.334 s] Query results (vector ids, then distances):
+query  0 nn's (397&477):  432699 (155,206,307,1,867,473,1071,573,326,1943,173,397,54,334,67,300,30,236,243,246,734,27,401,1363,2595,189,1618,3652,46,464,1406,392,605,2157,211,1560,477,152,1642,1496,679,51,308,12,715,63,579,332,3111,108,354,737,677,2890,585,3721,185,728,1596,186) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	199.396 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+query  1 nn's (588&495):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,468,300) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	152.401 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+query  2 nn's (3419&637):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,468,300) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	151.392 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+query  3 nn's (1795&72):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,468,300) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	151.215 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+query  4 nn's (425&0):  171736 (524,513,151,161,2223,2805,1137,628,1,1741,3492,400,2036,205,2496,41,266,596,1884,2288,2679,239,0,2801,124,470,208,6,19,862,2072,425,211,101,252,2149,16,837,158)  994273 (0,1529,3,58,332,2011,425,5,3321,1157)  388945 (425,0,1914,123,388,1152,837,1153,3450,1845,840,2686,1676,85,3390,517,3070,2679)  471526 (2654,2402,187,229,331,81,852,233,776,3560,3327,442,2,221,87,1564,85,3953,1282,452,944,1311,1161,619,362,1398,2328,868,2058,3580,30,980,1104,1894,1500,1675,1913,102,2181,21,3046,3,184,0,1746,2290,482,2071,3401,103,1,428,1060,345,1021,1487,2397,161,10,2546,3070,425,2630,805,1884,723,119)  686119 (0,1474,5,2183,425,503,902,1194)  451509 (85,57,425,164,2553,2437,1270,1268,0)  416872 (169,2847,55,998,208,3074,2923,289,0,1447,177,425,1291,1343)  652952 (0,230,1313,678,233,1305,1769,425,1119,503)  222673 (373,1221,551,281,307,3026,1450,686,2328,215,723,2630,27,1766,1667,1113,0,211,1035,199,161,1305,121,351,425)  332549 (1053,1188,750,37,52,1357,3,1778,1648,723,15,425,0,55,35,2805,1636,2382,2258) 
+     dis: 	150.865 151.419 154.257 154.992 155.278 155.561 156.071 156.076 157.429 157.805 
+GT Filename: ../wikicohere/gt_1m.bin.txt
+Recall@10: 0.090
+[51.219 s] -----DONE-----
