@@ -354,12 +354,16 @@ void searchIndexes(const Config& config, faiss::IndexACORNFlat* hybrid_index_ACO
             filter_ids_map[xq_idx * config.N + xb_idx] =  query_labels[xq_idx].isSubsetOf(base_labels[xb_idx]);
         }
     }
-
-    hybrid_index_ACORNFlat->search(config.nq, xq, config.k, dis2.data(), nns2.data(), filter_ids_map.data());
-
     double t2_f = elapsed();
 
-    printf("[%.3f s] *** Done Query %.3f\n", elapsed() - t0, t2_f - t1_f);
+    printf("[%.3f s] *** Done filter_ids_map %.3f\n", elapsed() - t0, t2_f - t1_f);
+
+    double t3 = elapsed();
+    hybrid_index_ACORNFlat->search(config.nq, xq, config.k, dis2.data(), nns2.data(), filter_ids_map.data());
+
+    double t4 = elapsed();
+
+    printf("[%.3f s] *** Done Query %.3f\n", elapsed() - t0, t4 - t3);
 
    
     // print config.nq, xq, config.k, dis2.data(), nns2.data(), filter_ids_map.data()

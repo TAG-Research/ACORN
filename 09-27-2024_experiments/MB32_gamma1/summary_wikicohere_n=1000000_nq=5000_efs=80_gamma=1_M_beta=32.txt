@@ -1,11 +1,11 @@
-Start time: 18:54
+Start time: 23:51
 Max threads available: 64
 [Config] N: 1000000, nq: 5000, dataset_path: ../wikicohere/
 loaded metadata for 81545: 17,285,787,596,1082,769,697,67,583,299,722,518
 loaded metadata from: ../wikicohere//base_labels.txt
 Number of lines loaded: 35000000
 Value of N: 1000000
-[14.193 s] Loaded metadata, 5000000000 attributes found
+[14.536 s] Loaded metadata, 5000000000 attributes found
 [0.000 s] Loading query vectors and attributes
 Reading bin file ../wikicohere//query.fbin ...
 #pts = 5000, #dims = 768
@@ -14,12 +14,12 @@ Reading bin file ../wikicohere//query.fbin ...
 #pts in part = 5000, #dims = 768, size = 15360000B
 Finished reading part of the bin file.
 Finished converting part data to float.
-[0.028 s] Loaded query vectors from ../wikicohere//query.fbin
+[0.030 s] Loaded query vectors from ../wikicohere//query.fbin
 Invalid dataset in load_aq
 loaded metadata from: ../wikicohere//query_labels.txt
 Number of lines loaded: 5000
 Value of N: 5000
-[0.029 s] Loaded 5000 queries
+[0.030 s] Loaded 5000 queries
 --ACORN index created
 SearchOnly 80
 ====================Read Index====================
@@ -91,14 +91,13 @@ METADATA VEC for number nodes per level
 ==============================================
 ==================== ACORN INDEX ====================
 [0.000 s] Searching the 10 nearest neighbors of 5000 vectors in the index, efsearch 80
-[0.000 s] *** Start filter_ids_map 1727488475.000
-[36.701 s] *** Done filter_ids_map 25.476
-[36.701 s] *** Start search 1727488512.000000
-[37.034 s] *** Search done. Query time: 0.333122
+[0.000 s] *** Start filter_ids_map 1727506328.000
+[466.618 s] *** Done filter_ids_map 453.218
+[468.751 s] *** Done Query 2.133
 config nq: 5000 dis size:50000nns size:50000id map:5000000000
 aq_strings size: 5000
 metadata_strings size: 35000000
-[37.034 s] Query results (vector ids, then distances):
+[468.751 s] Query results (vector ids, then distances):
 query  0 nn's (397&477):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,468,300) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
      dis: 	150.908 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
 query  1 nn's (588&495):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,468,300) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
@@ -109,6 +108,6 @@ query  3 nn's (1795&72):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,
      dis: 	151.215 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
 query  4 nn's (425&0):  667005 (21,651,1710,3332,1272,41,425,81,1130,475,0,272) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
      dis: 	161.128 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
-GT Filename: ../wikicohere/gt_1m.bin.txt
-Recall@10: 0.153
-[57.414 s] -----DONE-----
+GT Filename: ../wikicohere/gt_1M.bin.txt
+Error opening ground truth file ../wikicohere/gt_1M.bin.txt
+[489.011 s] -----DONE-----

@@ -29,7 +29,7 @@ gt="gt_1M.bin.txt"
 efc=100 # build limit
 efs=0 # search limi0t, 0 for build only, >1 for search only
 
-header="      N,   nq,   efc,  efs,   M,    M_beta, gamma,    recall,   query_time" 
+header="      N,   nq,   efc,  efs,   M,    M_beta, gamma,    recall,   query_time, bitmap_time" 
 summary_file=${now}_experiments/summary_${dataset}.txt
 rm -f $summary_file
 echo $header>> $summary_file
@@ -52,12 +52,12 @@ for M_beta in 32 64; do
                 ./build/demos/acorn $N $nq ../$dataset/ . . $gt $efc $M_beta $efs &>> ${txtfile}
                 # Extract Query time
                 query_time=$(grep -oP 'Done Query \K[0-9.]+(?=)' "$txtfile")
-
+                bitmap_time=$(grep -oP 'Done filter_ids_map \K[0-9.]+(?=)' "$txtfile")
                 # Extract Recall@10
                 recall=$(grep -oP 'Recall@10: \K[0-9.]+(?=)' "$txtfile")
                  # Print the results
                 #echo " N, nq,  efc,  efs,, M, M_beta, gamma, recall, query_time"
-                row="$N,$nq,$efc,$efs,$M_beta,$M_beta,$gamma,$recall,$query_time"
+                row="$N,$nq,$efc,$efs,$M_beta,$M_beta,$gamma,$recall,$query_time, $bitmap_time"
                 echo $row >> $summary_file
                 echo $row
              done

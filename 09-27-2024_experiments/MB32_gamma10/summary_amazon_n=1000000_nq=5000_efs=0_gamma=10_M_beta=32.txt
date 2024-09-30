@@ -377,3 +377,4 @@ Error opening ground truth file ../amazon/gt_1M.bin.txt
 [152.030 s] -----DONE-----
 Start time: 17:36
 Start time: 21:01
+Start time: 22:47
