@@ -319,14 +319,14 @@ void IndexACORN::search(
     for (idx_t i0 = 0; i0 < n; i0 += check_period) {
         idx_t i1 = std::min(i0 + check_period, n);
 
-#pragma omp parallel
+//#pragma omp parallel
         {
             VisitedTable vt(ntotal);
 
             DistanceComputer* dis = storage_distance_computer(storage);
             ScopeDeleter1<DistanceComputer> del(dis);
 
-#pragma omp for reduction(+ : n1, n2, n3, ndis, nreorder, candidates_loop)
+//#pragma omp for reduction(+ : n1, n2, n3, ndis, nreorder, candidates_loop)
             for (idx_t i = i0; i < i1; i++) {
                 idx_t* idxi = labels + i * k;
                 float* simi = distances + i * k;

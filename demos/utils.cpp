@@ -16,7 +16,14 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <set>
+#include <stack>
+#include <regex>
 // added these
 #include <faiss/Index.h>
 #include <stdlib.h>
@@ -39,6 +46,8 @@
 #include <numeric> // for std::accumulate
 #include <cmath>   // for std::mean and std::stdev
 #include <nlohmann/json.hpp>
+#include <tsl/robin_map.h>
+#include <tsl/robin_set.h>
 // #include <format>
 // for convenience
 using json = nlohmann::json;
@@ -88,7 +97,8 @@ float* fvecs_read(const char* fname, size_t* d_out, size_t* n_out) {
         abort();
     }
     int d;
-    fread(&d, 1, sizeof(int), f);
+    int size = fread(&d, 1, sizeof(int), f);
+    printf("Dimension: %d\n", d);
     assert((d > 0 && d < 1000000) || !"unreasonable dimension");
     fseek(f, 0, SEEK_SET);
     struct stat st;
@@ -109,6 +119,97 @@ float* fvecs_read(const char* fname, size_t* d_out, size_t* n_out) {
 
     fclose(f);
     return x;
+}
+
+
+
+#define PARTSIZE 10000000
+#define ALIGNMENT 512
+template <class T> T *aligned_malloc(const size_t n, const size_t alignment)
+{
+#ifdef _WINDOWS
+    return (T *)_aligned_malloc(sizeof(T) * n, alignment);
+#else
+    return static_cast<T *>(aligned_alloc(alignment, sizeof(T) * n));
+#endif
+}
+
+template <typename T> inline int get_num_parts(const char *filename)
+{
+    std::ifstream reader;
+    reader.exceptions(std::ios::failbit | std::ios::badbit);
+    reader.open(filename, std::ios::binary);
+    std::cout << "Reading bin file " << filename << " ...\n";
+    int npts_i32, ndims_i32;
+    reader.read((char *)&npts_i32, sizeof(int));
+    reader.read((char *)&ndims_i32, sizeof(int));
+    std::cout << "#pts = " << npts_i32 << ", #dims = " << ndims_i32 << std::endl;
+    reader.close();
+    uint32_t num_parts =
+        (npts_i32 % PARTSIZE) == 0 ? npts_i32 / PARTSIZE : (uint32_t)std::floor(npts_i32 / PARTSIZE) + 1;
+    std::cout << "Number of parts: " << num_parts << std::endl;
+    return num_parts;
+}
+
+template <typename T>
+inline void load_bin_as_float(const char *filename, float *&data, size_t &npts, size_t &ndims, int part_num)
+{
+     try {
+    std::ifstream reader;
+    reader.exceptions(std::ios::failbit | std::ios::badbit);
+    reader.open(filename, std::ios::binary);
+    
+    std::cout << "Reading bin file " << filename << " ...\n";
+    int npts_i32, ndims_i32;
+    reader.read((char *)&npts_i32, sizeof(int));
+    reader.read((char *)&ndims_i32, sizeof(int));
+    uint64_t start_id = part_num * PARTSIZE;
+    uint64_t end_id = (std::min)(start_id + PARTSIZE, (uint64_t)npts_i32);
+    npts = end_id - start_id;
+    ndims = (uint64_t)ndims_i32;
+    std::cout << "#pts in part = " << npts << ", #dims = " << ndims << ", size = " << npts * ndims * sizeof(T) << "B"
+              << std::endl;
+
+    reader.seekg(start_id * ndims * sizeof(T) + 2 * sizeof(uint32_t), std::ios::beg);
+    T *data_T = new T[npts * ndims];
+    reader.read((char *)data_T, sizeof(T) * npts * ndims);
+    std::cout << "Finished reading part of the bin file." << std::endl;
+    reader.close();
+    data = aligned_malloc<float>(npts * ndims, ALIGNMENT);
+#pragma omp parallel for schedule(dynamic, 32768)
+    for (int64_t i = 0; i < (int64_t)npts; i++)
+    {
+        for (int64_t j = 0; j < (int64_t)ndims; j++)
+        {
+            float cur_val_float = (float)data_T[i * ndims + j];
+            std::memcpy((char *)(data + i * ndims + j), (char *)&cur_val_float, sizeof(float));
+        }
+    }
+    delete[] data_T;
+    std::cout << "Finished converting part data to float." << std::endl;
+    } catch (const std::ios_base::failure& e) {
+        std::cerr << "I/O error: " << e.what() << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
+    }
+}
+
+float* fbin_read(const char* fname, size_t* d_out, size_t* n_out) {
+    float *base_data = nullptr;
+    int num_parts = get_num_parts<float>(fname);
+ 
+    size_t npoints, dim;
+    for (int p = 0; p < num_parts; p++)
+    {
+        size_t start_id = p * PARTSIZE;
+        load_bin_as_float<float>(fname, base_data, npoints, dim, p);
+        size_t end_id = start_id + npoints;
+
+        *d_out = dim;
+        *n_out = npoints;
+    }
+
+    return base_data;
 }
 
 // not very clean, but works as long as sizeof(int) == sizeof(float)
@@ -372,6 +473,37 @@ std::vector<int> load_aq(std::string dataset, int n_centroids, int alpha, int N)
     
 
 }
+ 
+    // Helper function to replace all occurrences of a substring with another string
+    void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+        if (from.empty())
+            return;
+        size_t start_pos = 0;
+        while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+            str.replace(start_pos, from.length(), to);
+            start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+        }
+    }
+
+std::vector<std::string> load_metadata_strings(std::string file_name, int N) {
+ 
+    std::vector<std::string> lines;
+    std::ifstream file(file_name);
+    std::string line;
+ 
+    while (std::getline(file, line)) {
+        lines.push_back(line);
+        if (lines.size() == 81546) {
+            std::cout << "loaded metadata for 81545: " << lines[81545] << std::endl;
+        }
+    }
+    file.close();
+
+    printf("loaded metadata from: %s\n", file_name.c_str());
+    printf("Number of lines loaded: %zu\n", lines.size());
+    printf("Value of N: %d\n", N);
+    return lines;
+}
 
 // assignment_type can be "rand", "soft", "soft_squared", "hard"
 std::vector<int> load_ab(std::string dataset, int n_centroids, std::string assignment_type, int N) {
@@ -461,7 +593,7 @@ std::vector<faiss::idx_t> load_gt(std::string dataset, int n_centroids, int alph
         std::vector<int> v_tmp = load_json_to_vector<int>(filepath);
         std::vector<faiss::idx_t> v(v_tmp.begin(), v_tmp.end());
         printf("loaded gt from: %s\n", filepath.c_str());
-
+        printf("gt size: %ld\n", v.size());
         // // print out data for debugging
         // for (faiss::idx_t i : v) {
         //     std::cout << i << " ";
@@ -548,8 +680,91 @@ std::vector<faiss::idx_t> load_gt(std::string dataset, int n_centroids, int alph
 
 
 
+class MultiLabel {
+public:
+    tsl::robin_set<std::string> base_clause;  // For base labels 
+    std::vector<std::vector<std::string>> query_clause;  // For query labels,first level is AND, second level is OR
+    // Constructors
+    MultiLabel() {}
+    static MultiLabel fromBase(const std::string& base_label) {
+        MultiLabel ml;
+        
+         std::istringstream new_iss(base_label);
+         std::string token;
+        while (getline(new_iss, token, ','))
+        {
+            token.erase(std::remove(token.begin(), token.end(), '\n'), token.end());
+            token.erase(std::remove(token.begin(), token.end(), '\r'), token.end());
+            ml.base_clause.insert(token);
+        }
+        return ml;
+    }
 
 
+    static MultiLabel fromQuery(std::string& query_label) {
+        MultiLabel ml;
+        std::istringstream new_iss(query_label);
+        std::string token;
+        std::vector<std::vector<std::string>> lbls(0);
+        while (getline(new_iss, token, '&'))
+        {
+            std::vector<std::string> or_clause(0);
+            std::istringstream inner_iss(token);
+            while (getline(inner_iss, token, '|'))
+            {
+                token.erase(std::remove(token.begin(), token.end(), '\n'), token.end());
+                token.erase(std::remove(token.begin(), token.end(), '\r'), token.end());
+                or_clause.push_back(token);
+            }
+
+            ml.query_clause.push_back(or_clause);
+        }
+          return ml;
+    }
+
+    void printQuery() {
+        for (uint32_t k = 0; k < this->query_clause.size(); k++)
+        {
+            for (uint32_t l = 0; l < this->query_clause[k].size(); l++)
+            {
+                std::cout << this->query_clause[k][l];
+                if (l < this->query_clause[k].size() - 1) {
+                    std::cout << "|";
+                }
+            }
+            if(k < this->query_clause.size() - 1) {
+            std::cout << "&";
+            }
+        }
+        std::cout << std::endl;
+    }
+
+    // Method to check if the query label is a subset of the base label
+    bool isSubsetOf(const MultiLabel& base_label) const {
+            bool pass = true;
+            for (uint32_t k = 0; k < this->query_clause.size(); k++)
+            {
+                // check OR clause inside AND clause
+                bool or_pass = false;
+                for (uint32_t l = 0; l < this->query_clause[k].size(); l++)
+                {
+                    if (base_label.base_clause.find(this->query_clause[k][l]) != base_label.base_clause.end())
+                    {
+                        or_pass = true;
+                        break;
+                    }
+                }
+
+                // if any OR clause is not satisfied, then AND clause is not satisfied otherwise AND clause is satisfied
+                if (or_pass == false) {
+                    pass = false;
+                    break;
+                }
+                
+            }
+        return pass;
+    }
+};
 
 
 

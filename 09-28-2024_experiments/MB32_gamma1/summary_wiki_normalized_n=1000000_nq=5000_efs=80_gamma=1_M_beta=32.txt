@@ -1,0 +1,113 @@
+Start time: 12:20
+Max threads available: 64
+[Config] N: 1000000, nq: 5000, dataset_path: ../wiki_normalized/
+loaded metadata for 81545: 17,285,787,596,1082,769,697,67,583,299,722,518
+loaded metadata from: ../wiki_normalized//base_labels.txt
+Number of lines loaded: 35000000
+Value of N: 1000000
+[14.327 s] Loaded metadata, 5000000000 attributes found
+[0.000 s] Loading query vectors and attributes
+Reading bin file ../wiki_normalized//query.fbin ...
+#pts = 5000, #dims = 769
+Number of parts: 1
+Reading bin file ../wiki_normalized//query.fbin ...
+#pts in part = 5000, #dims = 769, size = 15380000B
+Finished reading part of the bin file.
+Finished converting part data to float.
+[0.028 s] Loaded query vectors from ../wiki_normalized//query.fbin
+Invalid dataset in load_aq
+loaded metadata from: ../wiki_normalized//query_labels.txt
+Number of lines loaded: 5000
+Value of N: 5000
+[0.029 s] Loaded 5000 queries
+--ACORN index created
+SearchOnly 80
+====================Read Index====================
+
+[0.000 s] Read hybrid index from file: ../wiki_normalized//hybrid_index_M=32_efc=100_Mb=32_gamma=12_N1000000_M32.index
+====================================
+============ ACORN INDEX =============
+====================================
+========= METADATA =======
+	* cumulative max num neighbors per level
+		indx 0: 0
+		indx 1: 112
+		indx 2: 496
+		indx 3: 880
+		indx 4: 1264
+		indx 5: 1648
+	* level probabilities
+		level 0: 0.968750
+		level 1: 0.030273
+		level 2: 0.000946
+		level 3: 0.000030
+		level 4: 0.000001
+		level 5: 0.000000
+	* efConstruction: 100
+	* efSearch: 80
+	* max_level: 4
+	* entry_point: 118295
+	* gamma: 12
+========= LEVEL STATS OF ACORN =======
+========= LEVEL 0 =======
+* stats on level 0, max 112 neighbors per vertex:
+   1. nb of nodes: 1000000
+   2. neighbors per node: 77.30 (77296747)
+   3. nb of reciprocal neighbors: 34.58
+   4. nb of neighbors that are also neighbor-of-neighbors: 72.15 (72147613)
+========= LEVEL 1 =======
+* stats on level 1, max 384 neighbors per vertex:
+   1. nb of nodes: 31254
+   2. neighbors per node: 142.60 (4456799)
+   3. nb of reciprocal neighbors: 94.25
+   4. nb of neighbors that are also neighbor-of-neighbors: 132.14 (4129985)
+========= LEVEL 2 =======
+* stats on level 2, max 384 neighbors per vertex:
+   1. nb of nodes: 978
+   2. neighbors per node: 170.42 (166670)
+   3. nb of reciprocal neighbors: 158.37
+   4. nb of neighbors that are also neighbor-of-neighbors: 170.34 (166589)
+========= LEVEL 3 =======
+* stats on level 3, max 384 neighbors per vertex:
+   1. nb of nodes: 27
+   2. neighbors per node: 25.33 (684)
+   3. nb of reciprocal neighbors: 24.44
+   4. nb of neighbors that are also neighbor-of-neighbors: 25.19 (680)
+========= LEVEL 4 =======
+* stats on level 4, max 384 neighbors per vertex:
+   1. nb of nodes: 1
+   2. neighbors per node: 0.00 (0)
+   3. nb of reciprocal neighbors: 0.00
+   4. nb of neighbors that are also neighbor-of-neighbors: 0.00 (0)
+METADATA VEC for number nodes per level
+	level 0: 999825 nodes
+	level 1: 31253 nodes
+	level 2: 977 nodes
+	level 3: 27 nodes
+	level 4: 1 nodes
+	level 5: 0 nodes
+==============================================
+====================Search Results====================
+==============================================
+==================== ACORN INDEX ====================
+[0.000 s] Searching the 10 nearest neighbors of 5000 vectors in the index, efsearch 80
+[0.000 s] *** Start filter_ids_map 1727551254.000
+[465.372 s] *** Done filter_ids_map 454.080
+[468.591 s] *** Done Query 3.219
+config nq: 5000 dis size:50000nns size:50000id map:5000000000
+aq_strings size: 5000
+metadata_strings size: 35000000
+[468.591 s] Query results (vector ids, then distances):
+query  0 nn's (397&477):  432699 (155,206,307,1,867,473,1071,573,326,1943,173,397,54,334,67,300,30,236,243,246,734,27,401,1363,2595,189,1618,3652,46,464,1406,392,605,2157,211,1560,477,152,1642,1496,679,51,308,12,715,63,579,332,3111,108,354,737,677,2890,585,3721,185,728,1596,186) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	0.859555 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+query  1 nn's (588&495):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,468,300) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	0.604864 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+query  2 nn's (3419&637):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,468,300) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	0.601614 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+query  3 nn's (1795&72):  118295 (309,667,224,0,241,553,1498,826,229,726,45,110,468,300) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	0.601052 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+query  4 nn's (425&0):  667005 (21,651,1710,3332,1272,41,425,81,1130,475,0,272)  475214 (115,3582,842,1,7,2776,112,1438,41,214,81,2114,2007,708,1604,272,233,1083,1846,1701,177,576,3090,4,425,122,251,2577,1327,347,3839,1013,1544,1777,0,21) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) -1 (Not Found) 
+     dis: 	0.64882 0.73111 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 3.40282e+38 
+GT Filename: ../wiki_normalized/gt_1M.bin.txt
+Recall@10: 0.146
+[489.061 s] -----DONE-----

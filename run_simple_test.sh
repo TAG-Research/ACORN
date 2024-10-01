@@ -3,10 +3,10 @@ export debugSearchFlag=0
 
 
 
-cmake -DFAISS_ENABLE_GPU=OFF -DFAISS_ENABLE_PYTHON=OFF -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -B build
+#cmake -DFAISS_ENABLE_GPU=OFF -DFAISS_ENABLE_PYTHON=OFF -DBUILD_TESTING=ON -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -B build
 
-make -C build -j faiss
-make -C build utils
+#make -C build -j faiss
+#make -C build utils
 make -C build test_acorn
 
 
@@ -18,9 +18,9 @@ now=$(date +"%m-%d-%Y")
 
 
 # run of sift1M test
-N=1000000 
+N=10000 
 gamma=12 
-dataset=sift1M_test 
+dataset=sift1M
 M=32 
 M_beta=64
 
@@ -34,7 +34,7 @@ mkdir ${dir}
 TZ='America/Los_Angeles' date +"Start time: %H:%M" &>> ${dir}/summary_sift_n=${N}_gamma=${gamma}.txt
 
 
-./build/demos/test_acorn $N $gamma $dataset $M $M_beta  &>> ${dir}/summary_sift_n=${N}_gamma=${gamma}.txt
+./build/demos/test_acorn $N $gamma $dataset $M $M_beta  #&>> ${dir}/summary_sift_n=${N}_gamma=${gamma}.txt
 
      
 
